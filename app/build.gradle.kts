@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.samapp.renttrack"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.samapp.renttrack"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -54,6 +54,11 @@ dependencies {
     //DI(dagger hilt)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+
+    //coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

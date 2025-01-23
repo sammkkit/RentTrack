@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import java.time.LocalDate
 
 @Entity(
-    tableName = "tenant_table"
+    tableName = "tenant_table",
 )
 data class Tenant(
     @PrimaryKey(autoGenerate = true)val id:Int = 0,
@@ -14,7 +14,9 @@ data class Tenant(
     val contact:String = "",
     val rentDueDate: LocalDate= LocalDate.now(),
     val monthlyRent:Double = 0.0,
+    val tenantHouseNumber : String = "",
     val deposit:Double = 0.0,
     val outstandingDebt:Double = 0.0,
     val isPaid: Boolean = false,
+    val photoUri : String? = null
 )
