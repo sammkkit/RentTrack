@@ -17,6 +17,5 @@ data class Tenant(
     val tenantHouseNumber : String = "",
     val deposit:Double = 0.0,
     val outstandingDebt:Double = 0.0,
-    val isPaid: Boolean = false,
     val photoUri : String? = null
 )

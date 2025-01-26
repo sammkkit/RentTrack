@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -50,11 +51,8 @@ fun PhotoPickingComponent(
     )
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(50.dp))
             .size(100.dp)
-            .clickable {
-                getImage.launch("image/*")
-            }
+
         ,
         contentAlignment = Alignment.Center
     ) {
@@ -68,6 +66,9 @@ fun PhotoPickingComponent(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
+                    .clickable {
+                        getImage.launch("image/*")
+                    }
                 ,
                 contentScale = ContentScale.Crop
             )
@@ -75,7 +76,12 @@ fun PhotoPickingComponent(
             Icon(
                 painter = painterResource(R.drawable.user),
                 contentDescription = "Default avatar",
-                tint = Color.Gray
+                tint = Color.Gray,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable {
+                        getImage.launch("image/*")
+                    }
             )
             Icon(
                 imageVector = Icons.Default.AddCircle,
@@ -83,7 +89,7 @@ fun PhotoPickingComponent(
                 tint = Color.Black,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(10.dp)
+                    .padding(5.dp)
             )
         }
     }
