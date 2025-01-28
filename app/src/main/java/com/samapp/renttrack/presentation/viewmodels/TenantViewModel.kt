@@ -2,11 +2,13 @@ package com.samapp.renttrack.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samapp.renttrack.data.local.TypeConverter.ColorTypeConverter
 import com.samapp.renttrack.data.local.model.Tenant
 import com.samapp.renttrack.data.repository.TenantRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import com.samapp.renttrack.data.local.model.Result
+import com.samapp.renttrack.util.getRandomColor
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
@@ -33,7 +35,11 @@ class TenantViewModel @Inject constructor(
     fun addTenant(tenant: Tenant){
         viewModelScope.launch {
             _tenantListState.value = Result.Loading()
-            tenantRepository.insertTenant(tenant)
+
+            val randomColor = getRandomColor()
+            val tenantWithColor = tenant.copy(avatarBackgroundColor = ColorTypeConverter().fromColorToInt(randomColor))
+
+            tenantRepository.insertTenant(tenantWithColor)
         }
     }
     fun searchTenantsByName(nameQuery: String) {

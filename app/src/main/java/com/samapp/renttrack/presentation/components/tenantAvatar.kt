@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,10 +20,12 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.samapp.renttrack.data.local.TypeConverter.ColorTypeConverter
+import com.samapp.renttrack.data.local.model.Tenant
 import com.samapp.renttrack.util.getRandomColor
 
 @Composable
-fun TenantAvatar(photoUri: String?, name: String) {
+fun TenantAvatar(photoUri: String?, tenant: Tenant) {
     if (photoUri != null) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -36,7 +39,12 @@ fun TenantAvatar(photoUri: String?, name: String) {
                 .border(2.dp, Color.Gray, CircleShape)
         )
     } else {
-        val backgroundColor = getRandomColor()
+        val backgroundColor = ColorTypeConverter().fromIntToColor(tenant.avatarBackgroundColor)
+        val textColor = Color(
+            red = 1f - backgroundColor.red,
+            green = 1f - backgroundColor.green,
+            blue = 1f - backgroundColor.blue
+        )
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -45,8 +53,8 @@ fun TenantAvatar(photoUri: String?, name: String) {
                 .background(backgroundColor)
         ) {
             Text(
-                text = name.firstOrNull()?.toString()?.uppercase() ?: "U",
-                color = Color.Black,
+                text = tenant.name.firstOrNull()?.toString()?.uppercase() ?: "U",
+                color = textColor,
                 style = MaterialTheme.typography.titleLarge
             )
         }
@@ -56,5 +64,5 @@ fun TenantAvatar(photoUri: String?, name: String) {
 @Preview(showBackground = true)
 @Composable
 fun preview(){
-    TenantAvatar(photoUri = null, name = "John Doe")
+//    TenantAvatar(photoUri = null, name = "John Doe")
 }

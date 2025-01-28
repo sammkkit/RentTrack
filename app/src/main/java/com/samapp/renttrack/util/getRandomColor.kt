@@ -3,8 +3,9 @@ package com.samapp.renttrack.util
 import androidx.compose.ui.graphics.Color
 
 fun getRandomColor(): Color {
-    val colors = listOf(
-        Color.Red, Color.Green, Color.Blue, Color.Magenta, Color.Cyan, Color.Yellow
+    return  Color(
+        red = (100..255).random() / 255f,
+        green = (0..255).random() / 255f,
+        blue = (0..255).random() / 255f
     )
-    return colors.random()
 }

@@ -1,4 +1,4 @@
-package com.samapp.renttrack.data.local
+package com.samapp.renttrack.data.local.TypeConverter
 
 import androidx.room.TypeConverter
 import java.time.LocalDate

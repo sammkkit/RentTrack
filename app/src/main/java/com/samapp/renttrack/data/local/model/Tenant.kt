@@ -1,5 +1,7 @@
 package com.samapp.renttrack.data.local.model
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.LocalDate
@@ -17,5 +19,6 @@ data class Tenant(
     val tenantHouseNumber : String = "",
     val deposit:Double = 0.0,
     val outstandingDebt:Double = 0.0,
-    val photoUri : String? = null
+    val photoUri : String? = null,
+    val avatarBackgroundColor: Int = Color.Black.toArgb()
 )

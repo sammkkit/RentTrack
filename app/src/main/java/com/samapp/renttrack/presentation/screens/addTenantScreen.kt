@@ -1,9 +1,7 @@
 package com.samapp.renttrack.presentation.screens
 
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
@@ -42,7 +40,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samapp.renttrack.R
-//import com.samapp.renttrack.presentation.components.CustomTextField
 import com.samapp.renttrack.presentation.components.DatePickerTextField
 import com.samapp.renttrack.presentation.components.PhotoPickingComponent
 
@@ -53,16 +50,18 @@ fun AddTenantScreen(
 ) {
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     var name by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var contact by remember { mutableStateOf("") }
     var monthlyRent by remember { mutableStateOf("") }
     var tenantHouseNumber by remember { mutableStateOf("") }
     var deposit by remember { mutableStateOf("") }
     var rentDueDate by remember { mutableStateOf("") }
-
+    var addDetailsSection by remember { mutableStateOf(false) }
+    var isEmailValid by remember { mutableStateOf(true) }
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         PhotoPickingComponent(
@@ -161,7 +160,7 @@ fun AddTenantScreen(
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Home,
-                            contentDescription = "Tenant Name"
+                            contentDescription = "Tenant House Number"
                         )
                     },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -175,14 +174,14 @@ fun AddTenantScreen(
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
                     label = { Text("Monthly Rent") },
-                    value = deposit,
-                    onValueChange = { deposit = it },
+                    value = monthlyRent,
+                    onValueChange = { monthlyRent = it },
                     maxLines = 1,
                     singleLine = true,
                     leadingIcon = {
                         Icon(
                             painter = painterResource(R.drawable.rupee),
-                            contentDescription = "Tenant Name",
+                            contentDescription = "Monthly Rent",
                             modifier=Modifier.size(20.dp)
                         )
                     },
@@ -197,13 +196,78 @@ fun AddTenantScreen(
                 )
                 DatePickerTextField(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
+                        .fillMaxWidth(),
                     onDateSelected = { selectedDate ->
                         rentDueDate = selectedDate
                     }
                 )
+                //TODO - make "add fields"  text(Red color) those are optional that will include
+                //TODO - email , deposit and outstanding debt.
+                val sign = if (addDetailsSection) "- " else "+ "
+                Text(
+                    text = "${sign}Add Details( optional )",
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .clickable {
+                            addDetailsSection = !addDetailsSection
+                        }
+                    ,
+                    color = Color.Red
+                )
+                if(addDetailsSection){
 
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .padding(bottom = 16.dp),
+                        label = { Text("Email") },
+                        value = email,
+                        onValueChange = {
+                            email = it
+                            isEmailValid = it.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"))
+                        },
+                        maxLines = 1,
+                        singleLine = true,
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Email,
+                                contentDescription = "Email"
+                            )
+                        },
+                        isError = !isEmailValid,
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = if (isEmailValid) Color.DarkGray else Color.Red,
+                            unfocusedBorderColor = if (isEmailValid) Color.Gray else Color.Red,
+                            focusedLabelColor = if (isEmailValid) Color.DarkGray else Color.Red,
+                        )
+                    )
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        label = { Text("Deposit") },
+                        value = deposit,
+                        onValueChange = { deposit = it },
+                        maxLines = 1,
+                        singleLine = true,
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(R.drawable.rupee),
+                                contentDescription = "Monthly Rent",
+                                modifier=Modifier.size(20.dp)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Number
+                        ),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = Color.DarkGray,
+                            unfocusedBorderColor = Color.Gray,
+                            focusedLabelColor = Color.DarkGray,
+                        )
+                    )
+                }
             }
         }
     }
