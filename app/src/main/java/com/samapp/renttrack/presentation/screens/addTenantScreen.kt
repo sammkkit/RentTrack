@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
@@ -58,10 +61,14 @@ fun AddTenantScreen(
     var rentDueDate by remember { mutableStateOf("") }
     var addDetailsSection by remember { mutableStateOf(false) }
     var isEmailValid by remember { mutableStateOf(true) }
+
+    val scrollState = rememberScrollState()
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(scrollState)
+        ,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         PhotoPickingComponent(
@@ -254,7 +261,7 @@ fun AddTenantScreen(
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(R.drawable.rupee),
-                                contentDescription = "Monthly Rent",
+                                contentDescription = "Deposit",
                                 modifier=Modifier.size(20.dp)
                             )
                         },
@@ -267,6 +274,32 @@ fun AddTenantScreen(
                             focusedLabelColor = Color.DarkGray,
                         )
                     )
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        label = { Text("Debt") },
+                        value = deposit,
+                        onValueChange = { deposit = it },
+                        maxLines = 1,
+                        singleLine = true,
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(R.drawable.rupee),
+                                contentDescription = "Debt",
+                                modifier=Modifier.size(20.dp)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Number
+                        ),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = Color.DarkGray,
+                            unfocusedBorderColor = Color.Gray,
+                            focusedLabelColor = Color.DarkGray,
+                        )
+                    )
+
                 }
             }
         }

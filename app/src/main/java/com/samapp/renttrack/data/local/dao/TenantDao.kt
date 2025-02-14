@@ -10,7 +10,6 @@ import com.samapp.renttrack.data.local.model.Tenant
 
 @Dao
 interface TenantDao {
-    //
     @Insert
     suspend fun insertTenant(tenant:Tenant)
 

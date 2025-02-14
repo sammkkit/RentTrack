@@ -11,7 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.samapp.renttrack.di.App
+import com.samapp.renttrack.presentation.navigation.RootNavigationGraph
 import com.samapp.renttrack.presentation.screens.HomeScreen
+import com.samapp.renttrack.presentation.screens.MainScreen.MainScreen
+//import com.samapp.renttrack.presentation.screens.MainScreen
 import com.samapp.renttrack.ui.theme.RentTrackTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +25,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RentTrackTheme {
-                HomeScreen()
+                val navController = rememberNavController()
+                MainScreen(
+                    navController = navController
+                )
             }
         }
     }

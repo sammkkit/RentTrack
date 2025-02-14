@@ -7,4 +7,5 @@ sealed class Screen(val route: String) {
         fun createRoute(tenantId: Int) = "tenant_details/$tenantId"
     }
     data object Summary : Screen("summary")
+    data object BottomNavigation : Screen("bottom_navigation")
 }

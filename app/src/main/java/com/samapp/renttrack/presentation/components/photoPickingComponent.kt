@@ -39,6 +39,7 @@ import com.samapp.renttrack.R
 
 @Composable
 fun PhotoPickingComponent(
+    modifier: Modifier = Modifier,
     onPhotoPicked: (Uri?) -> Unit
 ){
     var photoUri by remember { mutableStateOf<Uri?>(null) }
@@ -50,7 +51,7 @@ fun PhotoPickingComponent(
         }
     )
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(100.dp)
 
         ,
