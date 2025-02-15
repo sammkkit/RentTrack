@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -115,18 +116,21 @@ val mockTenants = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    onFabClick: ()->Unit
 ) {
     Scaffold(
         modifier = Modifier,
+        bottomBar = { BottomNavigationBar(
+            navController = navController,
+            modifier = Modifier
+        ) },
         topBar = {
             CustomTopAppBar(title = "Tenants")
         },
         floatingActionButton = {
-            // Floating Action Button (FAB)
             FloatingActionButton(
-                onClick = { navController.navigate(Screen.AddTenant.route) },
+                onClick = { onFabClick() },
                 content = {
                     Icon(Icons.Default.Add, contentDescription = "Add Tenant")
                 }

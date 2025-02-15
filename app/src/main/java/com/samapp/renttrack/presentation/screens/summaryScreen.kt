@@ -17,6 +17,13 @@ fun SummaryScreen(
     navController: NavHostController
 ) {
     Scaffold(
+        modifier = modifier,
+        bottomBar = {
+            BottomNavigationBar(
+                navController = navController,
+                modifier = Modifier
+            )
+        },
         topBar = {
             CustomTopAppBar(title = "Summary")
         },

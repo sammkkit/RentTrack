@@ -8,4 +8,5 @@ sealed class Screen(val route: String) {
     }
     data object Summary : Screen("summary")
     data object BottomNavigation : Screen("bottom_navigation")
+    data object AddTenantNavGraph : Screen("add_tenant_nav_graph")
 }
