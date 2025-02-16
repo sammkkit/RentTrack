@@ -54,6 +54,7 @@ dependencies {
     //DI(dagger hilt)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.hilt.navigation.compose)
 
     //coil
     implementation(libs.coil.compose)

@@ -7,9 +7,11 @@ import com.samapp.renttrack.data.repository.PaymentHistoryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import  com.samapp.renttrack.data.local.model.Result
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+@HiltViewModel
 class PaymentHistoryViewModel @Inject constructor(
     private val paymentHistoryRepository: PaymentHistoryRepository
 ):ViewModel() {

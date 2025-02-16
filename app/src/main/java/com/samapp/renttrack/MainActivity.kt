@@ -17,7 +17,9 @@ import com.samapp.renttrack.presentation.screens.HomeScreen
 import com.samapp.renttrack.presentation.screens.MainScreen.MainScreen
 //import com.samapp.renttrack.presentation.screens.MainScreen
 import com.samapp.renttrack.ui.theme.RentTrackTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -54,24 +54,31 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.samapp.renttrack.R
+import com.samapp.renttrack.data.local.model.Tenant
 import com.samapp.renttrack.presentation.components.DatePickerTextField
 import com.samapp.renttrack.presentation.components.PhotoPickingComponent
+import com.samapp.renttrack.presentation.viewmodels.TenantViewModel
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTenantScreen(
     onBack:()->Unit
 ) {
+    val tenantViewModel: TenantViewModel = hiltViewModel()
+
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var contact by remember { mutableStateOf("") }
     var monthlyRent by remember { mutableStateOf("") }
+    var debt by remember { mutableStateOf("") }
     var tenantHouseNumber by remember { mutableStateOf("") }
     var deposit by remember { mutableStateOf("") }
-    var rentDueDate by remember { mutableStateOf("") }
+    var rentDueDate: LocalDate? by remember { mutableStateOf(null) }
     var addDetailsSection by remember { mutableStateOf(false) }
     var isEmailValid by remember { mutableStateOf(true) }
 
@@ -80,35 +87,57 @@ fun AddTenantScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add Tenant", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        "Add Tenant",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {  // ✅ Fixed Back Button Click
                         Icon(
                             imageVector = Icons.Default.ArrowBack, // Standard back arrow
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint =Color.Black
                         )
                     }
                 },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color.Gray)
+                colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color.White)
             )
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = Color.Gray
+                containerColor = Color.White
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { /* Handle Add Action */ }
+                        .clickable {
+                            tenantViewModel.addTenant(
+                                Tenant(
+                                    name = name,
+                                    email = email,
+                                    contact = contact,
+                                    monthlyRent = monthlyRent.toDoubleOrNull(),
+                                    tenantHouseNumber = tenantHouseNumber,
+                                    deposit = deposit.toDoubleOrNull(),
+                                    photoUri = photoUri?.toString(),
+                                    rentDueDate = rentDueDate,
+                                    outstandingDebt = debt.toDoubleOrNull()
+                                )
+                            )
+                            onBack()
+                        }
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "Add",
-                        fontSize = 20.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = Color.Black
                     )
                 }
             }
@@ -329,8 +358,8 @@ fun AddTenantScreen(
                                 .fillMaxWidth()
                                 .padding(bottom = 16.dp),
                             label = { Text("Debt") },
-                            value = deposit,
-                            onValueChange = { deposit = it },
+                            value = debt,
+                            onValueChange = { debt = it },
                             maxLines = 1,
                             singleLine = true,
                             leadingIcon = {

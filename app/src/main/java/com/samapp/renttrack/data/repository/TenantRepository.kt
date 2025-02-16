@@ -1,14 +1,18 @@
 package com.samapp.renttrack.data.repository
 
+import android.util.Log
 import com.samapp.renttrack.data.local.dao.TenantDao
 import com.samapp.renttrack.data.local.model.Result
 import com.samapp.renttrack.data.local.model.Tenant
 import javax.inject.Inject
 
+const val TAG = "TenantRepository"
+
 class TenantRepository @Inject constructor(
     private val tenantDao: TenantDao
 ) {
     suspend fun insertTenant(tenant: Tenant) {
+        Log.d(TAG, "inserted element = ${tenant}")
         tenantDao.insertTenant(tenant)
     }
     suspend fun updateTenant(tenant: Tenant){

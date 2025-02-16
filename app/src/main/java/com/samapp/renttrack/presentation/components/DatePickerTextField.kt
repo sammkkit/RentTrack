@@ -1,6 +1,7 @@
 package com.samapp.renttrack.presentation.components
 
 import android.app.DatePickerDialog
+import android.widget.DatePicker
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -31,30 +32,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
-
 @Composable
 fun DatePickerTextField(
     modifier: Modifier = Modifier,
-    onDateSelected: (String) -> Unit
+    onDateSelected: (LocalDate) -> Unit
 ) {
     val calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)
     val month = calendar.get(Calendar.MONTH)
     val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-    var selectedDate by remember { mutableStateOf("") }
+    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     // Trigger DatePickerDialog when clicked
     if (showDatePicker) {
         DatePickerDialog(
             LocalContext.current,
-            { _, selectedYear, selectedMonth, selectedDay ->
-                // Format the selected date as "DD/MM/YYYY"
-                val formattedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
-                selectedDate = formattedDate
-                onDateSelected(formattedDate)
+            { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
+                // Create LocalDate from selected values
+                val localDate = LocalDate.of(selectedYear, selectedMonth + 1, selectedDay)
+                selectedDate = localDate
+                onDateSelected(localDate)
                 showDatePicker = false
             },
             year, month, day
@@ -75,21 +77,26 @@ fun DatePickerTextField(
             Icon(
                 imageVector = Icons.Default.DateRange,
                 contentDescription = "Select Rent Due Date",
-                tint = if (selectedDate.isNotEmpty()) Color.Black else Color.Gray,
+                tint = if (selectedDate != null) Color.Black else Color.Gray,
                 modifier = Modifier.size(24.dp) // Ensure icon size is consistent
             )
             Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
             Text(
-                text = if (selectedDate.isNotEmpty()) selectedDate else "Select Rent Due Date",
+                text = selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                    ?: "Select Rent Due Date",  // Format date if selected
                 style = MaterialTheme.typography.bodyLarge,
-                color = if (selectedDate.isNotEmpty()) Color.Black else Color.Gray
+                color = if (selectedDate != null) Color.Black else Color.Gray
             )
         }
     }
-
 }
+
 @Preview(showBackground = true)
 @Composable
-fun DatePickerTextFieldpreview(){
-    DatePickerTextField(onDateSelected = {})
+fun PreviewDatePicker() {
+    DatePickerTextField(
+        onDateSelected = { selectedDate ->
+            println("Selected Date: $selectedDate")
+        }
+    )
 }

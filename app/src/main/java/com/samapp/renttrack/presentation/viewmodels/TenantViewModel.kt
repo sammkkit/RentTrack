@@ -15,9 +15,11 @@ import com.samapp.renttrack.domain.usecases.Tenants.GetTenantByIdUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.SearchTenantsByNameUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.UpdateTenantUseCase
 import com.samapp.renttrack.util.getRandomColor
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+@HiltViewModel
 class TenantViewModel @Inject constructor(
     private val getAllTenantsUseCase: GetAllTenantsUseCase,
     private val getTenantByIdUseCase: GetTenantByIdUseCase,

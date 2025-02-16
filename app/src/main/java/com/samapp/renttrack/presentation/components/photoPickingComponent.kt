@@ -77,7 +77,7 @@ fun PhotoPickingComponent(
             Icon(
                 painter = painterResource(R.drawable.user),
                 contentDescription = "Default avatar",
-                tint = Color.Gray,
+                tint = Color(0xFF539DF3),
                 modifier = Modifier
                     .clip(CircleShape)
                     .clickable {

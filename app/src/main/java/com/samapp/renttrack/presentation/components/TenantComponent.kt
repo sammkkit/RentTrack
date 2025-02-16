@@ -45,7 +45,7 @@ fun TenantComponent(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TenantAvatar(photoUri = tenant.photoUri, tenant = tenant)
+                TenantAvatar(tenant = tenant)
                 Column {
                     Text(
                         text = tenant.name,
@@ -61,7 +61,7 @@ fun TenantComponent(
                 }
             }
             RentShowingClip(
-                rent = tenant.monthlyRent.toInt()
+                rent = tenant.monthlyRent?.toInt() ?: 0
             )
         }
     }

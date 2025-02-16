@@ -15,6 +15,7 @@ import com.samapp.renttrack.domain.usecases.Tenants.UpdateTenantUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -82,5 +83,9 @@ object DatabaseModule {
     fun provideUpdateTenantUseCase(tenantRepository: TenantRepository): UpdateTenantUseCase {
         return UpdateTenantUseCase(tenantRepository)
     }
-
+    @Provides
+    @Singleton
+    fun provideContext(@ApplicationContext applicationContext: Context): Context {
+        return applicationContext
+    }
 }

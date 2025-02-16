@@ -1,5 +1,8 @@
 package com.samapp.renttrack.presentation.components
 
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,37 +17,60 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.samapp.renttrack.R
 import com.samapp.renttrack.data.local.TypeConverter.ColorTypeConverter
 import com.samapp.renttrack.data.local.model.Tenant
 import com.samapp.renttrack.util.getRandomColor
 
+const val TAG = "TenantAvatar"
 @Composable
-fun TenantAvatar(photoUri: String?, tenant: Tenant) {
-    if (photoUri != null) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(photoUri)
-                .crossfade(true)
-                .build(),
-            contentDescription = "Tenant Photo",
+fun TenantAvatar(tenant: Tenant) {
+    val uriString  = tenant.photoUri
+    Log.d(TAG, "Tenant Name: ${tenant.name}") // Log tenant name
+    Log.d(TAG, "URI String BEFORE parsing: $uriString")  // Log URI string
+    val uri: Uri? = try {
+        uriString?.let {
+            val parsedUri = Uri.parse(it)
+            Log.d(TAG, "Parsed URI: $parsedUri")
+            parsedUri
+        }
+    } catch (e: Exception) {
+        Log.e(TAG, "Error parsing URI: ${e.message}")
+        null
+    }
+    if (uri != null) {
+        Log.d(TAG, "TenantAvatar have photo uri: ${tenant.photoUri}")
+
+        val context = LocalContext.current
+
+        val request = ImageRequest.Builder(context)
+            .data(uri)
+            .crossfade(true) // Optional: Add crossfade animation
+            .build()
+
+        val painter = rememberAsyncImagePainter(request)
+
+        Image(
+            painter = painter,
+            contentDescription = "Image from URI",
             modifier = Modifier
-                .size(64.dp)
+                .size(64.dp) // Added a size modifier to make it visible
                 .clip(CircleShape)
-                .border(2.dp, Color.Gray, CircleShape)
         )
     } else {
-        val backgroundColor = ColorTypeConverter().fromIntToColor(tenant.avatarBackgroundColor)
-        val textColor = Color(
-            red = 1f - backgroundColor.red,
-            green = 1f - backgroundColor.green,
-            blue = 1f - backgroundColor.blue
-        )
+        Log.d(TAG, "TenantAvatar does not have photo uri: ${tenant.avatarBackgroundColor}")
+
+        val backgroundColor = Color(tenant.avatarBackgroundColor)
+        val textColor = Color.White
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -59,10 +85,4 @@ fun TenantAvatar(photoUri: String?, tenant: Tenant) {
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun preview(){
-//    TenantAvatar(photoUri = null, name = "John Doe")
 }
