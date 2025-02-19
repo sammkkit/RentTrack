@@ -19,7 +19,7 @@ class TenantRepository @Inject constructor(
         tenantDao.updateTenant(tenant)
     }
     suspend fun deleteTenant(tenant: Tenant){
-        tenantDao.deleteTenant(tenant)
+        tenantDao.deleteTenant(tenant.id)
     }
     suspend fun deleteTenantById(tenantId: Int) {
         tenantDao.deleteTenantById(tenantId)
@@ -32,13 +32,13 @@ class TenantRepository @Inject constructor(
             Result.Error(message = e.message)
         }
     }
-    suspend fun getTenantById(tenantId: Int): Result<List<Tenant>> {
+    suspend fun getTenantById(tenantId: Int): Result<Tenant> {
         return try {
             val tenant = tenantDao.getTenantById(tenantId)
             if (tenant != null) {
-                Result.Success(data = listOf(tenant))
+                Result.Success(data = tenant)
             } else {
-                Result.Success(data = emptyList())
+                Result.Error(message = "Tenant Not Found")
             }
         } catch (e: Exception) {
             Result.Error(message = e.message)

@@ -36,36 +36,36 @@ fun TenantAvatar(tenant: Tenant) {
     val uriString  = tenant.photoUri
     Log.d(TAG, "Tenant Name: ${tenant.name}") // Log tenant name
     Log.d(TAG, "URI String BEFORE parsing: $uriString")  // Log URI string
-    val uri: Uri? = try {
-        uriString?.let {
-            val parsedUri = Uri.parse(it)
-            Log.d(TAG, "Parsed URI: $parsedUri")
-            parsedUri
-        }
-    } catch (e: Exception) {
-        Log.e(TAG, "Error parsing URI: ${e.message}")
-        null
-    }
-    if (uri != null) {
-        Log.d(TAG, "TenantAvatar have photo uri: ${tenant.photoUri}")
-
-        val context = LocalContext.current
-
-        val request = ImageRequest.Builder(context)
-            .data(uri)
-            .crossfade(true) // Optional: Add crossfade animation
-            .build()
-
-        val painter = rememberAsyncImagePainter(request)
-
-        Image(
-            painter = painter,
-            contentDescription = "Image from URI",
-            modifier = Modifier
-                .size(64.dp) // Added a size modifier to make it visible
-                .clip(CircleShape)
-        )
-    } else {
+//    val uri: Uri? = try {
+//        uriString?.let {
+//            val parsedUri = Uri.parse(it)
+//            Log.d(TAG, "Parsed URI: $parsedUri")
+//            parsedUri
+//        }
+//    } catch (e: Exception) {
+//        Log.e(TAG, "Error parsing URI: ${e.message}")
+//        null
+//    }
+//    if (uri != null) {
+//        Log.d(TAG, "TenantAvatar have photo uri: ${tenant.photoUri}")
+//
+//        val context = LocalContext.current
+//
+//        val request = ImageRequest.Builder(context)
+//            .data(uri)
+//            .crossfade(true) // Optional: Add crossfade animation
+//            .build()
+//
+//        val painter = rememberAsyncImagePainter(request)
+//
+//        Image(
+//            painter = painter,
+//            contentDescription = "Image from URI",
+//            modifier = Modifier
+//                .size(64.dp) // Added a size modifier to make it visible
+//                .clip(CircleShape)
+//        )
+//    } else {
         Log.d(TAG, "TenantAvatar does not have photo uri: ${tenant.avatarBackgroundColor}")
 
         val backgroundColor = Color(tenant.avatarBackgroundColor)
@@ -84,5 +84,5 @@ fun TenantAvatar(tenant: Tenant) {
                 style = MaterialTheme.typography.titleLarge
             )
         }
-    }
+//    }
 }

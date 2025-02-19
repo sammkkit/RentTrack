@@ -1,5 +1,6 @@
 package com.samapp.renttrack.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -20,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -122,7 +124,7 @@ val mockTenants = listOf(
     )
 )
 
-
+val TAG ="HomeScreen"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -130,7 +132,11 @@ fun HomeScreen(
     onFabClick: ()->Unit
 ) {
     val tenantViewModel: TenantViewModel = hiltViewModel()
+    LaunchedEffect(Unit) {
+        tenantViewModel.fetchAllTenants()
+    }
     val tenantsListState by tenantViewModel.tenantListState.collectAsState()
+
     Scaffold(
         modifier = Modifier,
         bottomBar = { BottomNavigationBar(
@@ -176,7 +182,11 @@ fun HomeScreen(
                            itemsIndexed(it) { _, tenant ->
                                TenantComponent(
                                    modifier = Modifier,
-                                   tenant = tenant
+                                   tenant = tenant,
+                                   onClick = {tenantId->
+                                       Log.d(TAG,"id - ${tenantId}")
+                                       navController.navigate(Screen.TenantDetails.createRoute(tenantId))
+                                   }
                                )
                            }
                        }

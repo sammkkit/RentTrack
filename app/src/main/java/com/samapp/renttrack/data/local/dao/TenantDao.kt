@@ -19,8 +19,8 @@ interface TenantDao {
     @Update
     suspend fun updateTenant(tenant: Tenant)
 
-    @Delete
-    suspend fun deleteTenant(tenant: Tenant)
+    @Query("DELETE FROM tenant_table WHERE id = :tenantId")
+    suspend fun deleteTenant(tenantId: Int)
 
     @Query("DELETE FROM tenant_table WHERE id = :tenantId")
     suspend fun deleteTenantById(tenantId: Int)

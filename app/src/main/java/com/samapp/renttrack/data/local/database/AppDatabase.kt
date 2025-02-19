@@ -9,7 +9,10 @@ import com.samapp.renttrack.data.local.dao.TenantDao
 import com.samapp.renttrack.data.local.model.PaymentHistory
 import com.samapp.renttrack.data.local.model.Tenant
 
-@Database(entities = [Tenant::class, PaymentHistory::class], version = 1)
+@Database(
+    entities = [Tenant::class, PaymentHistory::class],
+    version = 1
+)
 @TypeConverters(DateConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun tenantDao(): TenantDao

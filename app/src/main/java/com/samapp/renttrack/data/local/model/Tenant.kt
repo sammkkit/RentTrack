@@ -12,8 +12,8 @@ import java.time.LocalDate
 data class Tenant(
     @PrimaryKey(autoGenerate = true)val id:Int = 0,
     val name:String = "",
-    val email:String? = "",
-    val contact:String? = "",
+    val email:String = "",
+    val contact:String = "",
     val rentDueDate: LocalDate? = LocalDate.now(),
     val monthlyRent:Double? = 0.0,
     val tenantHouseNumber : String = "",

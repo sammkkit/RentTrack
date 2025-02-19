@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetTenantByIdUseCase@Inject constructor(private val tenantRepository: TenantRepository) {
-    suspend fun execute(tenantId: Int): Result<List<Tenant>> {
+    suspend fun execute(tenantId: Int): Result<Tenant> {
         return tenantRepository.getTenantById(tenantId)
     }
 }

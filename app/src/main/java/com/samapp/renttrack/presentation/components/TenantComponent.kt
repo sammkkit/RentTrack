@@ -1,6 +1,7 @@
 package com.samapp.renttrack.presentation.components
 
 import android.graphics.Paint.Align
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,12 +25,17 @@ fun TenantComponent(
     modifier: Modifier = Modifier,
     tenant: Tenant = Tenant(
         name = "Sam",
-    )
+    ),
+    onClick: (Int) -> Unit = {}
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp),
+            .padding(bottom = 16.dp)
+            .clickable {
+                onClick(tenant.id)
+            }
+        ,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)

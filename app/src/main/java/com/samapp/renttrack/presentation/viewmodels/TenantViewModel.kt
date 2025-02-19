@@ -1,5 +1,6 @@
 package com.samapp.renttrack.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samapp.renttrack.data.local.TypeConverter.ColorTypeConverter
@@ -19,6 +20,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+val TAG = "TenantViewModel"
 @HiltViewModel
 class TenantViewModel @Inject constructor(
     private val getAllTenantsUseCase: GetAllTenantsUseCase,
@@ -29,7 +31,10 @@ class TenantViewModel @Inject constructor(
     private val updateTenantUseCase: UpdateTenantUseCase
 ) : ViewModel(){
     private val _tenantListState = MutableStateFlow<Result<List<Tenant>>>(Result.Loading())
-    val tenantListState :  StateFlow<Result<List<Tenant>>> = _tenantListState
+    val tenantListState : StateFlow<Result<List<Tenant>>> = _tenantListState
+
+    private val _tenantState = MutableStateFlow<Result<Tenant>>(Result.Loading())
+    val tenantState: StateFlow<Result<Tenant>> = _tenantState
 
     init {
         fetchAllTenants()
@@ -44,35 +49,39 @@ class TenantViewModel @Inject constructor(
 
     fun getTenantById(tenantId: Int) {
         viewModelScope.launch {
-            _tenantListState.value = Result.Loading()
-            val tenant = getTenantByIdUseCase.execute(tenantId)
-            _tenantListState.value = tenant
+            _tenantState.value = Result.Loading() // Ensure UI updates
+            val result = getTenantByIdUseCase.execute(tenantId)
+            Log.d("TenantViewModel", "Fetched tenant: ${result.data}") // Debugging
+            _tenantState.value = result
         }
     }
 
-    fun addTenant(tenant: Tenant){
+
+    fun addTenant(tenant: Tenant) {
         viewModelScope.launch {
-            _tenantListState.value = Result.Loading()
             addTenantUseCase.execute(tenant)
+            _tenantListState.value = Result.Loading()
             fetchAllTenants()
         }
     }
+
+
     fun searchTenantsByName(nameQuery: String) {
         viewModelScope.launch {
             _tenantListState.value = Result.Loading()
             _tenantListState.value = searchTenantsByNameUseCase.execute(nameQuery)
         }
     }
+
     fun deleteTenant(tenant: Tenant) {
         viewModelScope.launch {
-            _tenantListState.value = Result.Loading()
             deleteTenantUseCase.execute(tenant)
             fetchAllTenants()
         }
     }
+
     fun updateTenant(tenant: Tenant) {
         viewModelScope.launch {
-            _tenantListState.value = Result.Loading()
             updateTenantUseCase.execute(tenant)
             fetchAllTenants()
         }

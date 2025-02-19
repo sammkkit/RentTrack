@@ -1,6 +1,8 @@
 package com.samapp.renttrack.presentation.screens
 
 import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -69,7 +72,7 @@ fun AddTenantScreen(
     onBack:()->Unit
 ) {
     val tenantViewModel: TenantViewModel = hiltViewModel()
-
+    val context = LocalContext.current
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -115,6 +118,23 @@ fun AddTenantScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
+                            if(name.isEmpty() || contact.isEmpty() || monthlyRent.isEmpty() || rentDueDate ==null ){
+                                Log.d("addTenant","${
+                                    Tenant(
+                                        name = name,
+                                        email = email,
+                                        contact = contact,
+                                        monthlyRent = monthlyRent.toDoubleOrNull(),
+                                        tenantHouseNumber = tenantHouseNumber,
+                                        deposit = deposit.toDoubleOrNull(),
+                                        photoUri = photoUri?.toString(),
+                                        rentDueDate = rentDueDate,
+                                        outstandingDebt = debt.toDoubleOrNull()
+                                    )
+                                }")
+                                Toast.makeText(context, "Fill All Details", Toast.LENGTH_SHORT).show()
+                                return@clickable
+                            }
                             tenantViewModel.addTenant(
                                 Tenant(
                                     name = name,

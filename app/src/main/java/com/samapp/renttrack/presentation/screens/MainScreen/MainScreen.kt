@@ -15,15 +15,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.samapp.renttrack.presentation.navigation.BottomNavigationBar
 import com.samapp.renttrack.presentation.navigation.Screen
 import com.samapp.renttrack.presentation.screens.AddTenantScreen
 import com.samapp.renttrack.presentation.screens.HomeScreen
 import com.samapp.renttrack.presentation.screens.SummaryScreen
+import com.samapp.renttrack.presentation.screens.TenantDetailScreen
 
 //
 //@Composable
@@ -75,6 +78,17 @@ fun MainScreen() {
                 popExitTransition = { popExitTransition }
             ) {
                 AddTenantScreen(
+                    onBack = { rootNavController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = Screen.TenantDetails.route,
+                arguments = listOf(navArgument("tenantId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val tenantId = backStackEntry.arguments?.getInt("tenantId") ?: return@composable
+                TenantDetailScreen(
+                    tenantId = tenantId,
                     onBack = { rootNavController.popBackStack() }
                 )
             }
