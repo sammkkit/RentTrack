@@ -50,23 +50,23 @@ fun DatePickerTextField(
 
     // Trigger DatePickerDialog when clicked
     if (showDatePicker) {
-        DatePickerDialog(
+        val datePickerDialog = DatePickerDialog(
             LocalContext.current,
-            { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
-                // Create LocalDate from selected values
+            { _, selectedYear, selectedMonth, selectedDay ->
                 val localDate = LocalDate.of(selectedYear, selectedMonth + 1, selectedDay)
                 selectedDate = localDate
                 onDateSelected(localDate)
                 showDatePicker = false
             },
             year, month, day
-        ).show()
+        )
+        datePickerDialog.show()
     }
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .border(1.dp, Color.Gray) // Border for outlined effect
+            .border(1.dp, MaterialTheme.colorScheme.outline)
             .clickable { showDatePicker = true }
             .padding(16.dp) // Padding inside the Box
     ) {
@@ -77,7 +77,8 @@ fun DatePickerTextField(
             Icon(
                 imageVector = Icons.Default.DateRange,
                 contentDescription = "Select Rent Due Date",
-                tint = if (selectedDate != null) Color.Black else Color.Gray,
+                tint = if (selectedDate != null) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.onSurfaceVariant, // Adaptive tint
                 modifier = Modifier.size(24.dp) // Ensure icon size is consistent
             )
             Spacer(modifier = Modifier.width(8.dp)) // Space between icon and text
@@ -85,7 +86,8 @@ fun DatePickerTextField(
                 text = selectedDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                     ?: "Select Rent Due Date",  // Format date if selected
                 style = MaterialTheme.typography.bodyLarge,
-                color = if (selectedDate != null) Color.Black else Color.Gray
+                color = if (selectedDate != null) MaterialTheme.colorScheme.onSurface
+                else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

@@ -25,7 +25,7 @@ fun RentShowingClip(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp)) // Rounded corners
-            .background(Color.Black)
+            .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(16.dp))
             .padding(top = 4.dp,bottom = 4.dp,start = 16.dp,end = 16.dp)
 
         ,
@@ -33,9 +33,9 @@ fun RentShowingClip(
     ) {
         Text(
             text = "₹$rent",
-            color = Color.White, // White text
-            style = MaterialTheme.typography.bodyMedium, // Use a prominent text style
-            fontWeight = FontWeight.Bold // Bold for emphasis
+            color = MaterialTheme.colorScheme.onSecondary,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold
         )
     }
 }

@@ -95,7 +95,7 @@ fun AddTenantScreen(
                         "Add Tenant",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 navigationIcon = {
@@ -103,16 +103,18 @@ fun AddTenantScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack, // Standard back arrow
                             contentDescription = "Back",
-                            tint =Color.Black
+                            tint =MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
             )
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = Color.White
+                containerColor = MaterialTheme.colorScheme.surface
             ) {
                 Box(
                     modifier = Modifier
@@ -157,7 +159,7 @@ fun AddTenantScreen(
                         text = "Add",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -184,7 +186,7 @@ fun AddTenantScreen(
                     .padding(top = 16.dp, bottom = 16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(
                     modifier = Modifier
@@ -207,9 +209,8 @@ fun AddTenantScreen(
                             )
                         },
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Color.DarkGray,
-                            unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = Color.DarkGray,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                     OutlinedTextField(
@@ -248,9 +249,8 @@ fun AddTenantScreen(
                             keyboardType = KeyboardType.Number
                         ),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Color.DarkGray,
-                            unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = Color.DarkGray,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                     OutlinedTextField(
@@ -270,9 +270,8 @@ fun AddTenantScreen(
                             )
                         },
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Color.DarkGray,
-                            unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = Color.DarkGray,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                     OutlinedTextField(
@@ -295,9 +294,8 @@ fun AddTenantScreen(
                             keyboardType = KeyboardType.Number
                         ),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Color.DarkGray,
-                            unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = Color.DarkGray,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                     DatePickerTextField(
@@ -317,7 +315,7 @@ fun AddTenantScreen(
                             .clickable {
                                 addDetailsSection = !addDetailsSection
                             },
-                        color = Color.Red
+                        color = MaterialTheme.colorScheme.primary
                     )
                     if (addDetailsSection) {
 
@@ -343,9 +341,10 @@ fun AddTenantScreen(
                             },
                             isError = !isEmailValid,
                             colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = if (isEmailValid) Color.DarkGray else Color.Red,
-                                unfocusedBorderColor = if (isEmailValid) Color.Gray else Color.Red,
-                                focusedLabelColor = if (isEmailValid) Color.DarkGray else Color.Red,
+                                focusedBorderColor = if (isEmailValid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                                unfocusedBorderColor = if (isEmailValid) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) else MaterialTheme.colorScheme.error,
+                                focusedLabelColor = if (isEmailValid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                                cursorColor = MaterialTheme.colorScheme.primary
                             )
                         )
                         OutlinedTextField(
@@ -368,9 +367,8 @@ fun AddTenantScreen(
                                 keyboardType = KeyboardType.Number
                             ),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = Color.DarkGray,
-                                unfocusedBorderColor = Color.Gray,
-                                focusedLabelColor = Color.DarkGray,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                         OutlinedTextField(
@@ -393,9 +391,8 @@ fun AddTenantScreen(
                                 keyboardType = KeyboardType.Number
                             ),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = Color.DarkGray,
-                                unfocusedBorderColor = Color.Gray,
-                                focusedLabelColor = Color.DarkGray,
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
 

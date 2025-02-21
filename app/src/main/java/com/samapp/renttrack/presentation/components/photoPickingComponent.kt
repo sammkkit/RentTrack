@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,7 +54,11 @@ fun PhotoPickingComponent(
     Box(
         modifier = modifier
             .size(100.dp)
-
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable {
+                getImage.launch("image/*")
+            }
         ,
         contentAlignment = Alignment.Center
     ) {
@@ -67,9 +72,6 @@ fun PhotoPickingComponent(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
-                    .clickable {
-                        getImage.launch("image/*")
-                    }
                 ,
                 contentScale = ContentScale.Crop
             )
@@ -77,20 +79,18 @@ fun PhotoPickingComponent(
             Icon(
                 painter = painterResource(R.drawable.user),
                 contentDescription = "Default avatar",
-                tint = Color(0xFF539DF3),
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
-                    .clip(CircleShape)
-                    .clickable {
-                        getImage.launch("image/*")
-                    }
             )
             Icon(
                 imageVector = Icons.Default.AddCircle,
                 contentDescription = "Add photo",
-                tint = Color.Black,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(5.dp)
+                    .padding(6.dp)
+                    .size(24.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
             )
         }
     }

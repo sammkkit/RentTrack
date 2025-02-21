@@ -1,6 +1,7 @@
 package com.samapp.renttrack.presentation.components
 
 import android.graphics.Paint.Align
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,7 +41,7 @@ fun TenantComponent(
         ,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row (
             modifier = Modifier
@@ -56,13 +59,14 @@ fun TenantComponent(
                     Text(
                         text = tenant.name,
                         modifier = Modifier.padding(start = 8.dp),
-                        color = Color.Black,
-                        fontSize = 18.sp
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyLarge
                     )
                     Text(
                         text = "Due Date : ${tenant.rentDueDate}",
                         modifier = Modifier.padding(start = 8.dp),
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }

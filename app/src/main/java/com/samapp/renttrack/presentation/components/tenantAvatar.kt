@@ -75,12 +75,11 @@ fun TenantAvatar(tenant: Tenant) {
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(64.dp)
-                .clip(CircleShape)
-                .background(backgroundColor)
+                .background(backgroundColor, CircleShape)
         ) {
             Text(
                 text = tenant.name.firstOrNull()?.toString()?.uppercase() ?: "U",
-                color = textColor,
+                color = MaterialTheme.colorScheme.surface,
                 style = MaterialTheme.typography.titleLarge
             )
         }

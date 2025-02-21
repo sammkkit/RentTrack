@@ -1,19 +1,29 @@
 package com.samapp.renttrack.presentation.navigation
 
+import android.app.Activity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.SideEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,9 +50,10 @@ fun BottomNavigationBar(
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     var selectedItem = items.indexOfFirst { it.route == currentRoute }.takeIf { it != -1 } ?: 0
 
+
     NavigationBar(
-        modifier = modifier,
-        containerColor = Color.White,
+//        modifier = modifier.windowInsetsPadding(WindowInsets.navigationBars) ,
+        containerColor = MaterialTheme.colorScheme.surface,
     ) {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
@@ -50,7 +61,7 @@ fun BottomNavigationBar(
                         Icon(
                             painter = painterResource(id = item.icon),
                             contentDescription = item.route,
-                            tint = if(selectedItem== index)Color(0xFF539DF3) else Color.Black,
+                            tint = if(selectedItem== index)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier
                                 .size(35.dp)
                                 .offset(y = if (selectedItem == index) (-3).dp else 0.dp)
@@ -60,7 +71,7 @@ fun BottomNavigationBar(
                     {
                         Text(
                             text = item.label,
-                            color = Color(0xFF539DF3),
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -74,7 +85,7 @@ fun BottomNavigationBar(
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = Color.White
+                    indicatorColor = MaterialTheme.colorScheme.surface // Theme-based indicator color
                 )
             )
         }
