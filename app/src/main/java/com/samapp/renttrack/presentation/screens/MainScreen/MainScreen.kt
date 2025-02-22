@@ -6,10 +6,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -52,10 +54,11 @@ fun MainScreen() {
 
     NavHost(
         navController = rootNavController,
-        startDestination = "bottomNav"
+        startDestination = Screen.BottomNavigation.route,
+        modifier = Modifier.background(MaterialTheme.colorScheme.background),
     ) {
         // Navigation Graph with BottomBar (Home & Summary)
-        navigation(startDestination = Screen.Home.route, route = "bottomNav") {
+        navigation(startDestination = Screen.Home.route, route = Screen.BottomNavigation.route) {
             composable(Screen.Home.route) {
                 HomeScreen(
                     onFabClick = { rootNavController.navigate(Screen.AddTenantNavGraph.route) },

@@ -63,7 +63,7 @@ fun BottomNavigationBar(
                             contentDescription = item.route,
                             tint = if(selectedItem== index)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier
-                                .size(35.dp)
+                                .size(if(index != 1)35.dp else 25.dp)
                                 .offset(y = if (selectedItem == index) (-3).dp else 0.dp)
                         )
                 },
