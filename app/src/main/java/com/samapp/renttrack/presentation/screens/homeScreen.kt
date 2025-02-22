@@ -2,6 +2,7 @@ package com.samapp.renttrack.presentation.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -181,14 +182,18 @@ fun HomeScreen(
                }
                is Result.Success -> {
                    val tenants = (tenantsListState as Result.Success<List<Tenant>>).data
-                   tenants?.let {
+                   if (tenants.isNullOrEmpty()) {
+                       Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                           Text("No tenants found", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+                       }
+                   } else {
                        LazyColumn {
-                           itemsIndexed(it) { _, tenant ->
+                           itemsIndexed(tenants) { _, tenant ->
                                TenantComponent(
                                    modifier = Modifier,
                                    tenant = tenant,
-                                   onClick = {tenantId->
-                                       Log.d(TAG,"id - ${tenantId}")
+                                   onClick = { tenantId ->
+                                       Log.d(TAG, "id - $tenantId")
                                        navController.navigate(Screen.TenantDetails.createRoute(tenantId))
                                    }
                                )
