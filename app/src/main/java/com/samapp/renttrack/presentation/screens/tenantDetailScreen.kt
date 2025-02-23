@@ -2,7 +2,6 @@ package com.samapp.renttrack.presentation.screens
 
 import android.net.Uri
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,7 +19,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -49,7 +47,7 @@ fun TenantDetailScreen(
         tenantViewModel.getTenantById(tenantId)
     }
 
-    var photoUri by remember { mutableStateOf<Uri?>(null) }
+    var filepath by remember { mutableStateOf<String?>(null) }
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var contact by remember { mutableStateOf("") }
@@ -100,7 +98,7 @@ fun TenantDetailScreen(
             tenantHouseNumber = tenant.tenantHouseNumber
             deposit = tenant.deposit?.toString() ?: ""
             debt = tenant.outstandingDebt?.toString() ?: ""
-            photoUri = tenant.photoUri?.let { Uri.parse(it) }
+            filepath = tenant.filePath
             rentDueDate = tenant.rentDueDate
 
             Scaffold(
@@ -138,7 +136,7 @@ fun TenantDetailScreen(
                                                 monthlyRent = monthlyRent.toDoubleOrNull(),
                                                 tenantHouseNumber = tenantHouseNumber,
                                                 deposit = deposit.toDoubleOrNull(),
-                                                photoUri = photoUri?.toString(),
+                                                filePath = filepath,
                                                 rentDueDate = rentDueDate,
                                                 outstandingDebt = debt.toDoubleOrNull()
                                             )
@@ -178,7 +176,7 @@ fun TenantDetailScreen(
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    PhotoPickingComponent(onPhotoPicked = { photoUri = it })
+                    PhotoPickingComponent(onPhotoPicked = { filepath = it })
                     Spacer(modifier = Modifier.height(16.dp))
 
                     OutlinedTextField(

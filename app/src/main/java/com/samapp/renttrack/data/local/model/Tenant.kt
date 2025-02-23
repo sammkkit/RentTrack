@@ -19,6 +19,6 @@ data class Tenant(
     val tenantHouseNumber : String = "",
     val deposit:Double? = 0.0,
     val outstandingDebt:Double? = 0.0,
-    val photoUri : String? = null,
+    val filePath : String? = null,
     val avatarBackgroundColor: Int = Color.Black.toArgb()
 )
