@@ -3,6 +3,7 @@ package com.samapp.renttrack.presentation.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -138,29 +139,31 @@ fun tenantDetailScreen(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = colors.surface,
-                actions = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        Button(
-                            onClick = {
+                containerColor = colors.primary,
+                modifier = Modifier
+                    .clickable {
 
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = colors.primary)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.transactionhistory)
-                                , contentDescription = "Balance History",
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Balance History")
-                        }
-                    }
+                    },
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        ,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.transactionhistory),
+                        contentDescription = "transaction history",
+                        tint = colors.onPrimary,
+                        modifier = Modifier
+                            .size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "Transactions",
+                        fontSize = 22.sp
+                    )
                 }
-            )
+            }
         }
     ) {  padding ->
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

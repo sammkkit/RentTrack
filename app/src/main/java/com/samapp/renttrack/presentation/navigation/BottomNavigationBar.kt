@@ -54,11 +54,10 @@ fun BottomNavigationBar(
 
 
     NavigationBar(
-//        modifier = modifier.windowInsetsPadding(WindowInsets.navigationBars) ,
+        modifier = Modifier.background(MaterialTheme.colorScheme.background),
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
         items.forEachIndexed { index, item ->
-//            val isSelected by remember(selectedRoute) { mutableStateOf(item.route == selectedRoute) }
             NavigationBarItem(
                 icon = {
                         Icon(
@@ -90,7 +89,7 @@ fun BottomNavigationBar(
                 },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = MaterialTheme.colorScheme.surface
-                )
+                ),
             )
         }
     }

@@ -39,7 +39,10 @@ fun RootNavigationGraph(modifier: Modifier, navController: NavHostController) {
         modifier = modifier.background(MaterialTheme.colorScheme.background)
     ) {
         /** 🔹 Bottom Navigation Graph */
-        navigation(startDestination = Screen.Home.route, route = Screen.BottomNavigation.route) {
+        navigation(
+            startDestination = Screen.Home.route,
+            route = Screen.BottomNavigation.route,
+        ) {
             composable(Screen.Home.route) {
                 HomeScreen(
                     onFabClick = { navController.navigate(Screen.AddTenant.route) },

@@ -1,6 +1,7 @@
 package com.samapp.renttrack.presentation.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -118,53 +119,40 @@ fun changeTenantDetailScreen(
                 },
                 bottomBar = {
                     BottomAppBar(
-                        containerColor = colors.surface,
-                        actions = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceAround
-                            ) {
-                                Button(
-                                    onClick = {
-                                        tenantViewModel.updateTenant(
-                                            Tenant(
-                                                id = tenantId,
-                                                name = name,
-                                                email = email,
-                                                contact = contact,
-                                                monthlyRent = monthlyRent.toDoubleOrNull(),
-                                                tenantHouseNumber = tenantHouseNumber,
-                                                deposit = deposit.toDoubleOrNull(),
-                                                filePath = filepath,
-                                                rentDueDate = rentDueDate,
-                                                outstandingDebt = debt.toDoubleOrNull()
-                                            )
-                                        )
-                                        Toast.makeText(context, "Tenant updated", Toast.LENGTH_SHORT).show()
-                                        onBack()
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = colors.primary)
-                                ) {
-                                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Update")
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Update")
-                                }
-
-                                Button(
-                                    onClick = {
-                                        tenantViewModel.deleteTenant(tenant)
-                                        Toast.makeText(context, "Tenant deleted", Toast.LENGTH_SHORT).show()
-                                        onBack()
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = colors.error)
-                                ) {
-                                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Delete")
-                                }
-                            }
+                        containerColor = colors.primary,
+                        modifier = Modifier
+                            .clickable {
+                                tenantViewModel.updateTenant(
+                                    Tenant(
+                                        id = tenantId,
+                                        name = name,
+                                        email = email,
+                                        contact = contact,
+                                        monthlyRent = monthlyRent.toDoubleOrNull(),
+                                        tenantHouseNumber = tenantHouseNumber,
+                                        deposit = deposit.toDoubleOrNull(),
+                                        filePath = filepath,
+                                        rentDueDate = rentDueDate,
+                                        outstandingDebt = debt.toDoubleOrNull()
+                                    )
+                                )
+                                Toast.makeText(context, "Tenant updated", Toast.LENGTH_SHORT).show()
+                                onBack()
+                            },
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Update", modifier = Modifier.size(24.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Update",
+                                fontSize = 22.sp
+                            )
                         }
-                    )
+                    }
+
                 }
             ) { padding ->
                 Column(
