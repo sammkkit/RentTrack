@@ -1,6 +1,7 @@
 package com.samapp.renttrack.presentation.navigation
 
 import android.app.Activity
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
@@ -26,6 +27,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.SideE
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -48,7 +50,7 @@ fun BottomNavigationBar(
 //        BottomNavigationItem.test
     )
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-    var selectedItem = items.indexOfFirst { it.route == currentRoute }.takeIf { it != -1 } ?: 0
+    var isSelected = items.indexOfFirst { it.route == currentRoute }.takeIf { it != -1 } ?: 0
 
 
     NavigationBar(
@@ -56,36 +58,38 @@ fun BottomNavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
         items.forEachIndexed { index, item ->
+//            val isSelected by remember(selectedRoute) { mutableStateOf(item.route == selectedRoute) }
             NavigationBarItem(
                 icon = {
                         Icon(
                             painter = painterResource(id = item.icon),
                             contentDescription = item.route,
-                            tint = if(selectedItem== index)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                            tint = if(isSelected == index)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier
                                 .size(if(index != 1)35.dp else 25.dp)
-                                .offset(y = if (selectedItem == index) (-3).dp else 0.dp)
+                                .offset { IntOffset(0, if (isSelected == index) (-3).dp.roundToPx() else 0) }
                         )
                 },
-                label = if (selectedItem == index) {
-                    {
-                        Text(
-                            text = item.label,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                } else null,
-                selected = selectedItem == index,
+                label = {
+                        if (isSelected == index) {
+                            Text(
+                                text = item.label,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                } ,
+                selected = isSelected == index,
                 onClick = {
-                    selectedItem = index
+                    isSelected = index
                     navController.navigate(item.route){
                         popUpTo(Screen.Home.route) { saveState = true }
                         launchSingleTop = true
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = MaterialTheme.colorScheme.surface // Theme-based indicator color
+                    indicatorColor = MaterialTheme.colorScheme.surface
                 )
             )
         }

@@ -17,6 +17,7 @@ import com.samapp.renttrack.domain.usecases.Tenants.SearchTenantsByNameUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.UpdateTenantUseCase
 import com.samapp.renttrack.util.getRandomColor
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
@@ -43,7 +44,10 @@ class TenantViewModel @Inject constructor(
     fun fetchAllTenants() {
         viewModelScope.launch {
             _tenantListState.value = Result.Loading()
-            _tenantListState.value = getAllTenantsUseCase.execute()
+            Log.d("TenantViewModel", "Fetching tenants...")
+            val tenants = getAllTenantsUseCase.execute()
+            Log.d("TenantViewModel", "Fetched tenants: ${tenants.data}")
+            _tenantListState.value = tenants
         }
     }
 
@@ -60,7 +64,7 @@ class TenantViewModel @Inject constructor(
     fun addTenant(tenant: Tenant) {
         viewModelScope.launch {
             addTenantUseCase.execute(tenant)
-            _tenantListState.value = Result.Loading()
+            delay(1000)
             fetchAllTenants()
         }
     }
@@ -76,6 +80,7 @@ class TenantViewModel @Inject constructor(
     fun deleteTenant(tenant: Tenant) {
         viewModelScope.launch {
             deleteTenantUseCase.execute(tenant)
+            delay(1000)
             fetchAllTenants()
         }
     }

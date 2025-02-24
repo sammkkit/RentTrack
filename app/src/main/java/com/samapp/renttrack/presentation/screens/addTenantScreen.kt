@@ -107,30 +107,11 @@ fun AddTenantScreen(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.surface
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            if(name.isEmpty() || contact.isEmpty() || monthlyRent.isEmpty() || rentDueDate ==null ){
-                                Log.d("addTenant","${
-                                    Tenant(
-                                        name = name,
-                                        email = email,
-                                        contact = contact,
-                                        monthlyRent = monthlyRent.toDoubleOrNull(),
-                                        tenantHouseNumber = tenantHouseNumber,
-                                        deposit = deposit.toDoubleOrNull(),
-                                        filePath = filepath,
-                                        rentDueDate = rentDueDate,
-                                        outstandingDebt = debt.toDoubleOrNull()
-                                    )
-                                }")
-                                Toast.makeText(context, "Fill All Details", Toast.LENGTH_SHORT).show()
-                                return@clickable
-                            }
-                            tenantViewModel.addTenant(
+                containerColor = MaterialTheme.colorScheme.surface,
+                modifier = Modifier
+                    .clickable {
+                        if(name.isEmpty() || contact.isEmpty() || monthlyRent.isEmpty() || rentDueDate ==null ){
+                            Log.d("addTenant","${
                                 Tenant(
                                     name = name,
                                     email = email,
@@ -142,9 +123,30 @@ fun AddTenantScreen(
                                     rentDueDate = rentDueDate,
                                     outstandingDebt = debt.toDoubleOrNull()
                                 )
-                            )
-                            onBack()
+                            }")
+                            Toast.makeText(context, "Fill All Details", Toast.LENGTH_SHORT).show()
+                            return@clickable
                         }
+                        tenantViewModel.addTenant(
+                            Tenant(
+                                name = name,
+                                email = email,
+                                contact = contact,
+                                monthlyRent = monthlyRent.toDoubleOrNull(),
+                                tenantHouseNumber = tenantHouseNumber,
+                                deposit = deposit.toDoubleOrNull(),
+                                filePath = filepath,
+                                rentDueDate = rentDueDate,
+                                outstandingDebt = debt.toDoubleOrNull()
+                            )
+                        )
+                        Toast.makeText(context, "Tenant added successfully!", Toast.LENGTH_SHORT).show()
+                        onBack()
+                    }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {

@@ -19,7 +19,8 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.samapp.renttrack.di.App
 import com.samapp.renttrack.presentation.screens.HomeScreen
-import com.samapp.renttrack.presentation.screens.MainScreen.MainScreen
+//import com.samapp.renttrack.presentation.screens.MainScreen.MainScreen
+import com.samapp.renttrack.presentation.screens.MainScreen.RootNavigationGraph
 //import com.samapp.renttrack.presentation.screens.MainScreen
 import com.samapp.renttrack.ui.theme.RentTrackTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,7 +32,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RentTrackTheme {
-                MainScreen()
+                RootNavigationGraph(
+                    modifier = Modifier.fillMaxSize(),
+                    navController = rememberNavController()
+                )
             }
         }
     }
