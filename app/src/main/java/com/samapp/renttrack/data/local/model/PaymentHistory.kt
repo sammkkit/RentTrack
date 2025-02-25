@@ -2,8 +2,10 @@ package com.samapp.renttrack.data.local.model
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.LocalDate
+import java.time.YearMonth
 
 @Entity(
     tableName = "payment_history_table",
@@ -12,12 +14,17 @@ import java.time.LocalDate
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("tenantId"),
         onDelete = ForeignKey.CASCADE
-    )]
+    )],
+    indices = [Index(value = ["tenantId"])]
 )
 data class PaymentHistory(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val tenantId: Int, // Foreign key reference to Tenant
-    val paymentAmount: Double, // Amount paid in this transaction
-    val paymentDate: LocalDate = LocalDate.now(), // Date of the payment
-    val paymentForWhichMonth: LocalDate = LocalDate.now(), // Month for which the payment was made
+    val tenantId: Int,
+    val paymentAmount: Double,
+    val paymentDate: LocalDate = LocalDate.now(),
+    val paymentForWhichMonth: YearMonth = YearMonth.now(),
+    val paymentType: PaymentType = PaymentType.RENT
 )
+enum class PaymentType {
+    RENT, DEPOSIT, UTILITY, OTHER
+}

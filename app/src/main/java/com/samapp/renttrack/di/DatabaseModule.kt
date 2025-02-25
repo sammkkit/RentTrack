@@ -30,7 +30,8 @@ object DatabaseModule {
             context.applicationContext,
             AppDatabase::class.java,
             "rent_track_database"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
     @Provides
     fun provideTenantDao(database: AppDatabase): TenantDao {

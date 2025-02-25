@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -34,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -50,16 +52,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.samapp.renttrack.R
+import com.samapp.renttrack.data.local.model.PaymentHistory
+import com.samapp.renttrack.data.local.model.PaymentType
 import com.samapp.renttrack.data.local.model.Result
 import com.samapp.renttrack.data.local.model.Tenant
+import com.samapp.renttrack.presentation.components.MonthSelectionDropDown
+import com.samapp.renttrack.presentation.viewmodels.PaymentHistoryViewModel
 import com.samapp.renttrack.presentation.viewmodels.TenantViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,6 +77,7 @@ fun tenantDetailScreen(
     onUpdate: (Int)->Unit
 ) {
     val tenantViewModel: TenantViewModel = hiltViewModel()
+    val paymentHistoryViewModel: PaymentHistoryViewModel = hiltViewModel()
     val colors = MaterialTheme.colorScheme
     LaunchedEffect(tenantId) {
         launch(Dispatchers.IO) {
@@ -186,7 +195,7 @@ fun tenantDetailScreen(
 
                 is Result.Success -> {
                     val tenant = state.data as Tenant
-
+                    var showPaymentDialog by remember { mutableStateOf(false) }
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -196,7 +205,62 @@ fun tenantDetailScreen(
                         Text(text = "Name: ${tenant.name}", fontSize = 20.sp)
                         Text(text = "Rent: ${tenant.monthlyRent}", fontSize = 20.sp)
                         Text(text = "Contact: ${tenant.contact}", fontSize = 20.sp)
+                        Button(
+                            onClick = { showPaymentDialog = true }, // Open payment dialog
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Record Payment")
+                        }
+
                     }
+                    if (showPaymentDialog) {
+                        var paymentAmount by remember { mutableStateOf("") }
+                        var selectedMonth by remember { mutableStateOf<YearMonth>(YearMonth.now()) }
+                        var selectedPaymentType by remember { mutableStateOf(PaymentType.RENT) }
+
+                        AlertDialog(
+                            onDismissRequest = { showPaymentDialog = false },
+                            title = { Text("Record Payment") },
+                            text = {
+                                Column {
+                                    OutlinedTextField(
+                                        value = paymentAmount,
+                                        onValueChange = { paymentAmount = it },
+                                        label = { Text("Amount") },
+                                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                                    )
+                                    MonthSelectionDropDown(
+                                        selectedMonth = selectedMonth,
+                                        onMonthSelected = { it->
+                                            selectedMonth=it
+                                        }
+                                    )
+                                }
+                            },
+                            confirmButton = {
+                                Button(onClick = {
+                                    // Call ViewModel function to save payment
+                                    paymentHistoryViewModel.addPaymentHistory(
+                                        PaymentHistory(
+                                            tenantId = tenantId,
+                                            paymentAmount = paymentAmount.toDouble(),
+                                            paymentForWhichMonth = selectedMonth,
+                                            paymentType = selectedPaymentType
+                                        )
+                                    )
+                                    showPaymentDialog = false
+                                }) {
+                                    Text("Save")
+                                }
+                            },
+                            dismissButton = {
+                                Button(onClick = { showPaymentDialog = false }) {
+                                    Text("Cancel")
+                                }
+                            }
+                        )
+                    }
+
                 }
             }
         }
