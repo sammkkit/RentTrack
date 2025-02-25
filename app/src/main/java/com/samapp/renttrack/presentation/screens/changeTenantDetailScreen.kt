@@ -85,7 +85,7 @@ fun changeTenantDetailScreen(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = colors.primary,
+                containerColor = colors.surface,
                 modifier = Modifier
                     .clickable {
                         tenantViewModel.updateTenant(

@@ -153,7 +153,7 @@ fun tenantDetailScreen(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = colors.primary,
+                containerColor = colors.surface,
                 modifier = Modifier
                     .clickable {
 
@@ -167,7 +167,7 @@ fun tenantDetailScreen(
                     Icon(
                         painter = painterResource(R.drawable.transactionhistory),
                         contentDescription = "transaction history",
-                        tint = colors.onPrimary,
+                        tint = colors.onSurface,
                         modifier = Modifier
                             .size(28.dp)
                     )
@@ -205,6 +205,13 @@ fun tenantDetailScreen(
                         Text(text = "Name: ${tenant.name}", fontSize = 20.sp)
                         Text(text = "Rent: ${tenant.monthlyRent}", fontSize = 20.sp)
                         Text(text = "Contact: ${tenant.contact}", fontSize = 20.sp)
+                        Text(text = "id: ${tenant.id}", fontSize = 20.sp)
+                        Text(text = "email: ${tenant.email}", fontSize = 20.sp)
+                        Text(text = "avatarBackgroundColor: ${tenant.avatarBackgroundColor}", fontSize = 20.sp)
+                        Text(text = "deposit: ${tenant.deposit}", fontSize = 20.sp)
+                        Text(text = "outstandingDebt: ${tenant.outstandingDebt}", fontSize = 20.sp)
+                        Text(text = "tenantHouseNumber: ${tenant.tenantHouseNumber}", fontSize = 20.sp)
+                        Text(text = "filePath: ${tenant.filePath}", fontSize = 20.sp)
                         Button(
                             onClick = { showPaymentDialog = true }, // Open payment dialog
                             modifier = Modifier.fillMaxWidth()

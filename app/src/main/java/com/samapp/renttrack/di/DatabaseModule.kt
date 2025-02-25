@@ -7,6 +7,9 @@ import com.samapp.renttrack.data.local.dao.TenantDao
 import com.samapp.renttrack.data.local.database.AppDatabase
 import com.samapp.renttrack.data.repository.PaymentHistoryRepository
 import com.samapp.renttrack.data.repository.TenantRepository
+import com.samapp.renttrack.domain.usecases.PaymentHistory.AddPaymentHistoryUseCase
+import com.samapp.renttrack.domain.usecases.PaymentHistory.GetAllPaymentHistoryUseCase
+import com.samapp.renttrack.domain.usecases.PaymentHistory.GetPaymentHistoryForTenantUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.AddTenantUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.DeleteTenantUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.GetAllTenantsUseCase
@@ -33,6 +36,13 @@ object DatabaseModule {
         ).fallbackToDestructiveMigration()
             .build()
     }
+
+    @Provides
+    @Singleton
+    fun provideContext(@ApplicationContext applicationContext: Context): Context {
+        return applicationContext
+    }
+
     @Provides
     fun provideTenantDao(database: AppDatabase): TenantDao {
         return database.tenantDao()
@@ -54,7 +64,11 @@ object DatabaseModule {
         return PaymentHistoryRepository(paymentHistoryDao)
     }
 
-    // Provide UseCases
+
+
+
+
+    // Provide Tenant UseCases
     @Provides
     @Singleton
     fun provideGetAllTenantsUseCase(tenantRepository: TenantRepository): GetAllTenantsUseCase {
@@ -84,9 +98,30 @@ object DatabaseModule {
     fun provideUpdateTenantUseCase(tenantRepository: TenantRepository): UpdateTenantUseCase {
         return UpdateTenantUseCase(tenantRepository)
     }
+
+
+
+
+    // Provide Payment History UseCases
     @Provides
     @Singleton
-    fun provideContext(@ApplicationContext applicationContext: Context): Context {
-        return applicationContext
+    fun provideGetPaymentHistoryForTenantUseCase(paymentHistoryRepository: PaymentHistoryRepository): GetPaymentHistoryForTenantUseCase {
+        return GetPaymentHistoryForTenantUseCase(paymentHistoryRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAddPaymentHistoryUseCase(
+        paymentHistoryRepository: PaymentHistoryRepository,
+        getTenantByIdUseCase: GetTenantByIdUseCase,
+        updateTenantUseCase: UpdateTenantUseCase
+    ): AddPaymentHistoryUseCase {
+        return AddPaymentHistoryUseCase(paymentHistoryRepository, getTenantByIdUseCase, updateTenantUseCase)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetAllPaymentHistoryUseCase(paymentHistoryRepository: PaymentHistoryRepository): GetAllPaymentHistoryUseCase {
+        return GetAllPaymentHistoryUseCase(paymentHistoryRepository)
     }
 }
