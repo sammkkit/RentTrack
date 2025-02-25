@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -56,6 +58,8 @@ import com.samapp.renttrack.R
 import com.samapp.renttrack.data.local.model.Result
 import com.samapp.renttrack.data.local.model.Tenant
 import com.samapp.renttrack.presentation.viewmodels.TenantViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,15 +70,18 @@ fun tenantDetailScreen(
 ) {
     val tenantViewModel: TenantViewModel = hiltViewModel()
     val colors = MaterialTheme.colorScheme
-    LaunchedEffect (Unit){
-        tenantViewModel.getTenantById(tenantId)
+    LaunchedEffect(tenantId) {
+        launch(Dispatchers.IO) {
+            tenantViewModel.getTenantById(tenantId)
+        }
     }
+
     val tenantState by tenantViewModel.tenantState.collectAsState()
     val tenant = (tenantState as? Result.Success<Tenant>)?.data
     val context = LocalContext.current
 
     var menuExpanded by remember { mutableStateOf(false) }
-
+    var showDeleteDialogBox by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -122,16 +129,14 @@ fun tenantDetailScreen(
                             text = { Text("Delete Tenant",color = colors.error) },
                             onClick = {
                                 menuExpanded = false
-                                //TODO - show a dialog box to confirm
-                                tenantViewModel.deleteTenant(tenant!!)
-                                Toast.makeText(context,"Tenant Deleted", Toast.LENGTH_SHORT).show()
-                                onBack()
+                                showDeleteDialogBox = true
                             },
                             colors = MenuDefaults.itemColors(
                                 textColor = colors.error,
                                 leadingIconColor = colors.error
                             )
                         )
+
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.surface)
@@ -197,7 +202,36 @@ fun tenantDetailScreen(
         }
 
     }
-
+    if (showDeleteDialogBox) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialogBox = false },
+            title = { Text("Confirm Deletion") },
+            text = { Text("Are you sure you want to delete this tenant? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialogBox = false
+                        tenantViewModel.deleteTenant(tenant!!)
+                        Toast.makeText(
+                            context,
+                            "Tenant Deleted",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        onBack()
+                    }
+                ) {
+                    Text("Delete", color = colors.error)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteDialogBox = false }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 //@Preview
 //@Composable

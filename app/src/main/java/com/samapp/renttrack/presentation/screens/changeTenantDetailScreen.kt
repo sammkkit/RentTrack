@@ -32,6 +32,8 @@ import com.samapp.renttrack.presentation.components.PhotoPickingComponent
 import com.samapp.renttrack.presentation.viewmodels.TenantViewModel
 import java.time.LocalDate
 import com.samapp.renttrack.data.local.model.Result
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,331 +46,333 @@ fun changeTenantDetailScreen(
     val colors = MaterialTheme.colorScheme
 
     LaunchedEffect(tenantId) {
-        tenantViewModel.getTenantById(tenantId)
+        launch(Dispatchers.IO) {
+            tenantViewModel.getTenantById(tenantId)
+        }
     }
 
-    var filepath by remember { mutableStateOf<String?>(null) }
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var contact by remember { mutableStateOf("") }
-    var monthlyRent by remember { mutableStateOf("") }
-    var debt by remember { mutableStateOf("") }
-    var tenantHouseNumber by remember { mutableStateOf("") }
-    var deposit by remember { mutableStateOf("") }
-    var rentDueDate: LocalDate? by remember { mutableStateOf(null) }
+    val tenantState by tenantViewModel.tenantState.collectAsState()
+
+    val tenant = (tenantState as? Result.Success<Tenant>)?.data
+
+    var name by remember(tenant) { mutableStateOf(tenant?.name ?: "") }
+    var email by remember(tenant) { mutableStateOf(tenant?.email ?: "") }
+    var contact by remember(tenant) { mutableStateOf(tenant?.contact ?: "") }
+    var monthlyRent by remember(tenant) { mutableStateOf(tenant?.monthlyRent?.toString() ?: "") }
+    var debt by remember(tenant) { mutableStateOf(tenant?.outstandingDebt?.toString() ?: "") }
+    var tenantHouseNumber by remember(tenant) { mutableStateOf(tenant?.tenantHouseNumber ?: "") }
+    var deposit by remember(tenant) { mutableStateOf(tenant?.deposit?.toString() ?: "") }
+    var rentDueDate by remember(tenant) { mutableStateOf(tenant?.rentDueDate) }
+    var filepath by remember(tenant) { mutableStateOf(tenant?.filePath) }
+
     var isEmailValid by remember { mutableStateOf(true) }
 
-    val tenantState by tenantViewModel.tenantState.collectAsState()
-    when (tenantState) {
-        is Result.Loading -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-            return
-        }
-
-        is Result.Error -> {
-            LaunchedEffect(Unit) {
-                Toast.makeText(context, "Tenant not found", Toast.LENGTH_SHORT).show()
-                onBack()
-            }
-            return
-        }
-
-        is Result.Success -> {
-            val tenant = (tenantState as Result.Success<Tenant>).data
-            if (tenant == null) {
-                LaunchedEffect(Unit) {
-                    Toast.makeText(context, "Tenant not found", Toast.LENGTH_SHORT).show()
-                    onBack()
-                }
-                return
-            }
-            // Proceed with using tenant data
-
-            if (tenant == null) {
-                Toast.makeText(context, "Tenant not found", Toast.LENGTH_SHORT).show()
-                onBack()
-                return
-            }
-            name = tenant.name
-            email = tenant.email ?: ""
-            contact = tenant.contact
-            monthlyRent = tenant.monthlyRent?.toString() ?: ""
-            tenantHouseNumber = tenant.tenantHouseNumber
-            deposit = tenant.deposit?.toString() ?: ""
-            debt = tenant.outstandingDebt?.toString() ?: ""
-            filepath = tenant.filePath
-            rentDueDate = tenant.rentDueDate
-
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = { Text("Tenant Detail", fontSize = 24.sp, color = colors.onSurface) },
-                        navigationIcon = {
-                            IconButton(onClick = onBack) {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowBack,
-                                    contentDescription = "Back",
-                                    tint = colors.onSurface
-                                )
-                            }
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.surface)
-                    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Tenant Detail", fontSize = 24.sp, color = colors.onSurface) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = colors.onSurface
+                        )
+                    }
                 },
-                bottomBar = {
-                    BottomAppBar(
-                        containerColor = colors.primary,
-                        modifier = Modifier
-                            .clickable {
-                                tenantViewModel.updateTenant(
-                                    Tenant(
-                                        id = tenantId,
-                                        name = name,
-                                        email = email,
-                                        contact = contact,
-                                        monthlyRent = monthlyRent.toDoubleOrNull(),
-                                        tenantHouseNumber = tenantHouseNumber,
-                                        deposit = deposit.toDoubleOrNull(),
-                                        filePath = filepath,
-                                        rentDueDate = rentDueDate,
-                                        outstandingDebt = debt.toDoubleOrNull()
-                                    )
-                                )
-                                Toast.makeText(context, "Tenant updated", Toast.LENGTH_SHORT).show()
-                                onBack()
-                            },
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Update", modifier = Modifier.size(24.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Update",
-                                fontSize = 22.sp
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.surface)
+            )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = colors.primary,
+                modifier = Modifier
+                    .clickable {
+                        tenantViewModel.updateTenant(
+                            Tenant(
+                                id = tenantId,
+                                name = name,
+                                email = email,
+                                contact = contact,
+                                monthlyRent = monthlyRent.toDoubleOrNull(),
+                                tenantHouseNumber = tenantHouseNumber,
+                                deposit = deposit.toDoubleOrNull(),
+                                filePath = filepath,
+                                rentDueDate = rentDueDate,
+                                outstandingDebt = debt.toDoubleOrNull()
                             )
+                        )
+                        Toast.makeText(context, "Tenant updated", Toast.LENGTH_SHORT).show()
+                        onBack()
+                    },
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Update",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "Update",
+                        fontSize = 22.sp
+                    )
+                }
+            }
+
+        }
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            when (tenantState) {
+                is Result.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                is Result.Error -> {
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(context, "Tenant not found", Toast.LENGTH_SHORT).show()
+                        onBack()
+                    }
+                }
+
+                is Result.Success -> {
+                    val tenant = (tenantState as Result.Success<Tenant>).data
+                    if (tenant == null) {
+                        LaunchedEffect(Unit) {
+                            Toast.makeText(context, "Tenant not found", Toast.LENGTH_SHORT).show()
+                            onBack()
                         }
                     }
-
-                }
-            ) { padding ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(16.dp)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    PhotoPickingComponent(onPhotoPicked = { filepath = it })
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    OutlinedTextField(
+                    if (tenant == null) {
+                        Toast.makeText(context, "Tenant not found", Toast.LENGTH_SHORT).show()
+                        onBack()
+                    }
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp, bottom = 16.dp),
-                        label = { Text("Tenant Name") },
-                        value = name,
-                        onValueChange = { name = it },
-                        maxLines = 1,
-                        singleLine = true,
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Tenant Name"
-                            )
-                        },
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    )
+                            .fillMaxSize()
+                            .padding(padding)
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        PhotoPickingComponent(onPhotoPicked = { filepath = it })
+                        Spacer(modifier = Modifier.height(16.dp))
 
-
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        label = { Text("Contact") },
-                        value = contact,
-                        onValueChange = { newValue ->
-                            if (newValue.length <= 10) {
-                                contact = newValue
-                            }
-                        },
-                        maxLines = 1,
-                        singleLine = true,
-                        leadingIcon = {
-                            Row(
-                                modifier = Modifier.padding(start = 18.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, bottom = 16.dp),
+                            label = { Text("Tenant Name") },
+                            value = name,
+                            onValueChange = { name = it },
+                            maxLines = 1,
+                            singleLine = true,
+                            leadingIcon = {
                                 Icon(
-                                    painter = painterResource(R.drawable.phone),
-                                    contentDescription = "Tenant Name",
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = "Tenant Name"
+                                )
+                            },
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+
+
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            label = { Text("Contact") },
+                            value = contact,
+                            onValueChange = { newValue ->
+                                if (newValue.length <= 10) {
+                                    contact = newValue
+                                }
+                            },
+                            maxLines = 1,
+                            singleLine = true,
+                            leadingIcon = {
+                                Row(
+                                    modifier = Modifier.padding(start = 18.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.phone),
+                                        contentDescription = "Tenant Name",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    if (contact.length >= 1) {
+                                        Text(
+                                            text = "+91",
+                                        )
+                                    }
+                                }
+                            },
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                keyboardType = KeyboardType.Number
+                            ),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+
+
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
+                                .padding(bottom = 16.dp),
+                            label = { Text("Tenant House Number") },
+                            value = tenantHouseNumber,
+                            onValueChange = { tenantHouseNumber = it },
+                            maxLines = 1,
+                            singleLine = true,
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Home,
+                                    contentDescription = "Tenant House Number"
+                                )
+                            },
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            label = { Text("Monthly Rent") },
+                            value = monthlyRent,
+                            onValueChange = { monthlyRent = it },
+                            maxLines = 1,
+                            singleLine = true,
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.rupee),
+                                    contentDescription = "Monthly Rent",
                                     modifier = Modifier.size(20.dp)
                                 )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                if (contact.length >= 1) {
-                                    Text(
-                                        text = "+91",
-                                    )
-                                }
+                            },
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                keyboardType = KeyboardType.Number
+                            ),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+
+                        DatePickerTextField(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            onDateSelected = { selectedDate ->
+                                rentDueDate = selectedDate
                             }
-                        },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Number
-                        ),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    )
 
+                        Text(
+                            "Optional Details",
+                            color = colors.error,
+                            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                        )
 
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
-                            .padding(bottom = 16.dp),
-                        label = { Text("Tenant House Number") },
-                        value = tenantHouseNumber,
-                        onValueChange = { tenantHouseNumber = it },
-                        maxLines = 1,
-                        singleLine = true,
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Home,
-                                contentDescription = "Tenant House Number"
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
+                                .padding(bottom = 16.dp),
+                            label = { Text("Email") },
+                            value = email,
+                            onValueChange = {
+                                email = it
+                                isEmailValid =
+                                    it.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"))
+                            },
+                            maxLines = 1,
+                            singleLine = true,
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Email,
+                                    contentDescription = "Email"
+                                )
+                            },
+                            isError = !isEmailValid,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = if (isEmailValid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                                unfocusedBorderColor = if (isEmailValid) MaterialTheme.colorScheme.onSurface.copy(
+                                    alpha = 0.5f
+                                ) else MaterialTheme.colorScheme.error,
+                                focusedLabelColor = if (isEmailValid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                                cursorColor = MaterialTheme.colorScheme.primary
                             )
-                        },
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    )
 
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        label = { Text("Monthly Rent") },
-                        value = monthlyRent,
-                        onValueChange = { monthlyRent = it },
-                        maxLines = 1,
-                        singleLine = true,
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.rupee),
-                                contentDescription = "Monthly Rent",
-                                modifier = Modifier.size(20.dp)
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            label = { Text("Deposit") },
+                            value = deposit,
+                            onValueChange = { deposit = it },
+                            maxLines = 1,
+                            singleLine = true,
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.rupee),
+                                    contentDescription = "Deposit",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                keyboardType = KeyboardType.Number
+                            ),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Number
-                        ),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    )
 
-                    DatePickerTextField(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        onDateSelected = { selectedDate ->
-                            rentDueDate = selectedDate
-                        }
-                    )
-
-                    Text(
-                        "Optional Details",
-                        color = colors.error,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
-                    )
-
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
-                            .padding(bottom = 16.dp),
-                        label = { Text("Email") },
-                        value = email,
-                        onValueChange = {
-                            email = it
-                            isEmailValid =
-                                it.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"))
-                        },
-                        maxLines = 1,
-                        singleLine = true,
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Email,
-                                contentDescription = "Email"
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            label = { Text("Debt") },
+                            value = debt,
+                            onValueChange = { debt = it },
+                            maxLines = 1,
+                            singleLine = true,
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.rupee),
+                                    contentDescription = "Debt",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                keyboardType = KeyboardType.Number
+                            ),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        },
-                        isError = !isEmailValid,
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = if (isEmailValid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                            unfocusedBorderColor = if (isEmailValid) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) else MaterialTheme.colorScheme.error,
-                            focusedLabelColor = if (isEmailValid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                            cursorColor = MaterialTheme.colorScheme.primary
                         )
-                    )
-
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        label = { Text("Deposit") },
-                        value = deposit,
-                        onValueChange = { deposit = it },
-                        maxLines = 1,
-                        singleLine = true,
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.rupee),
-                                contentDescription = "Deposit",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Number
-                        ),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    )
-
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        label = { Text("Debt") },
-                        value = debt,
-                        onValueChange = { debt = it },
-                        maxLines = 1,
-                        singleLine = true,
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.rupee),
-                                contentDescription = "Debt",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Number
-                        ),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    )
+                    }
                 }
             }
         }
