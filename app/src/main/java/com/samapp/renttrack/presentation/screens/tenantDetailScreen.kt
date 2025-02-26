@@ -242,14 +242,6 @@ fun tenantDetailScreen(
                                         label = { Text("Amount") },
                                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                                     )
-                                    MonthSelectionDropDown(
-                                        selectedMonth = selectedMonth,
-                                        onMonthSelected = { it->
-                                            selectedMonth=it
-                                        }
-                                    )
-                                    Spacer(Modifier.height(10.dp))
-                                    // Payment Type Dropdown
                                     ExposedDropdownMenuBox(
                                         expanded = expanded,
                                         onExpandedChange = { expanded = it }
@@ -279,6 +271,16 @@ fun tenantDetailScreen(
                                             }
                                         }
                                     }
+                                    Spacer(Modifier.height(10.dp))
+                                    if(selectedPaymentType.name == "RENT") {
+                                        MonthSelectionDropDown(
+                                            selectedMonth = selectedMonth,
+                                            onMonthSelected = { it ->
+                                                selectedMonth = it
+                                            }
+                                        )
+                                    }
+
                                 }
                             },
                             confirmButton = {

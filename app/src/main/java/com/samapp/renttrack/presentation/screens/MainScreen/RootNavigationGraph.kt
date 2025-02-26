@@ -26,7 +26,12 @@ import com.samapp.renttrack.presentation.screens.tenantDetailScreen
 
 
 @Composable
-fun RootNavigationGraph(modifier: Modifier, navController: NavHostController) {
+fun RootNavigationGraph(
+    modifier: Modifier,
+    navController: NavHostController,
+    isDarkTheme: Boolean,
+    onThemeToggle: () -> Unit
+) {
 
     val enterTransition: EnterTransition = fadeIn() + slideInHorizontally(initialOffsetX = { it })
     val exitTransition: ExitTransition = fadeOut() + slideOutHorizontally(targetOffsetX = { -it })
@@ -47,7 +52,9 @@ fun RootNavigationGraph(modifier: Modifier, navController: NavHostController) {
             composable(Screen.Home.route) {
                 HomeScreen(
                     onFabClick = { navController.navigate(Screen.AddTenant.route) },
-                    navController = navController
+                    navController = navController,
+                    isDarkTheme = isDarkTheme,
+                    onThemeToggle = onThemeToggle
                 )
             }
             composable(Screen.Summary.route) {
