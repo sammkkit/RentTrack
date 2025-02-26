@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
@@ -31,6 +33,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -57,12 +60,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.samapp.renttrack.R
 import com.samapp.renttrack.data.local.model.PaymentHistory
 import com.samapp.renttrack.data.local.model.PaymentType
 import com.samapp.renttrack.data.local.model.Result
 import com.samapp.renttrack.data.local.model.Tenant
 import com.samapp.renttrack.presentation.components.MonthSelectionDropDown
+import com.samapp.renttrack.presentation.navigation.Screen
 import com.samapp.renttrack.presentation.viewmodels.PaymentHistoryViewModel
 import com.samapp.renttrack.presentation.viewmodels.TenantViewModel
 import kotlinx.coroutines.Dispatchers
@@ -74,7 +79,8 @@ import java.time.YearMonth
 fun tenantDetailScreen(
     tenantId: Int,
     onBack: () -> Unit,
-    onUpdate: (Int)->Unit
+    onUpdate: (Int)->Unit,
+    navController : NavHostController
 ) {
     val tenantViewModel: TenantViewModel = hiltViewModel()
     val paymentHistoryViewModel: PaymentHistoryViewModel = hiltViewModel()
@@ -156,7 +162,7 @@ fun tenantDetailScreen(
                 containerColor = colors.surface,
                 modifier = Modifier
                     .clickable {
-
+                        navController.navigate(Screen.TransactionHistory.createRoute(tenantId))
                     },
             ) {
                 Row(
@@ -224,7 +230,7 @@ fun tenantDetailScreen(
                         var paymentAmount by remember { mutableStateOf("") }
                         var selectedMonth by remember { mutableStateOf<YearMonth>(YearMonth.now()) }
                         var selectedPaymentType by remember { mutableStateOf(PaymentType.RENT) }
-
+                        var expanded by remember { mutableStateOf(false) } // Controls dropdown visibility
                         AlertDialog(
                             onDismissRequest = { showPaymentDialog = false },
                             title = { Text("Record Payment") },
@@ -242,6 +248,37 @@ fun tenantDetailScreen(
                                             selectedMonth=it
                                         }
                                     )
+                                    Spacer(Modifier.height(10.dp))
+                                    // Payment Type Dropdown
+                                    ExposedDropdownMenuBox(
+                                        expanded = expanded,
+                                        onExpandedChange = { expanded = it }
+                                    ) {
+                                        OutlinedTextField(
+                                            value = selectedPaymentType.name,
+                                            onValueChange = {},
+                                            readOnly = true,
+                                            label = { Text("Payment Type") },
+                                            trailingIcon = {
+                                                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                                            },
+                                            modifier = Modifier.menuAnchor().fillMaxWidth()
+                                        )
+                                        DropdownMenu(
+                                            expanded = expanded,
+                                            onDismissRequest = { expanded = false }
+                                        ) {
+                                            PaymentType.values().forEach { type ->
+                                                DropdownMenuItem(
+                                                    text = { Text(type.name) },
+                                                    onClick = {
+                                                        selectedPaymentType = type
+                                                        expanded = false
+                                                    }
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             },
                             confirmButton = {

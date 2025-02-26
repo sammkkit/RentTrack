@@ -23,8 +23,8 @@ data class PaymentHistory(
     val paymentAmount: Double,
     val paymentDate: LocalDate = LocalDate.now(),
     val paymentForWhichMonth: YearMonth = YearMonth.now(),
-    val paymentType: PaymentType = PaymentType.RENT
+    val paymentType: PaymentType = PaymentType.RENT,
 )
 enum class PaymentType {
-    RENT, DEPOSIT, UTILITY, OTHER
+    RENT, DEPOSIT,DEBT
 }

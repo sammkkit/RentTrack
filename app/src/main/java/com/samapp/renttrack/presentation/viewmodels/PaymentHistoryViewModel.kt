@@ -25,6 +25,9 @@ class PaymentHistoryViewModel @Inject constructor(
     private val _paymentHistoryState = MutableStateFlow<Result<List<PaymentHistory>>>(Result.Loading())
     val paymentHistoryState: StateFlow<Result<List<PaymentHistory>>> = _paymentHistoryState
 
+    private val _AllpaymentHistoryState = MutableStateFlow<Result<List<PaymentHistory>>>(Result.Loading())
+    val AllpaymentHistoryState: StateFlow<Result<List<PaymentHistory>>> = _AllpaymentHistoryState
+
     fun getPaymentHistoryForTenant(tenantId: Int) {
         viewModelScope.launch {
             _paymentHistoryState.value = Result.Loading()
@@ -45,8 +48,8 @@ class PaymentHistoryViewModel @Inject constructor(
 
     fun getAllPaymentHistory() {
         viewModelScope.launch {
-            _paymentHistoryState.value = Result.Loading()
-            _paymentHistoryState.value = getAllPaymentHistoryUseCase()
+            _AllpaymentHistoryState.value = Result.Loading()
+            _AllpaymentHistoryState.value = getAllPaymentHistoryUseCase()
         }
     }
 }

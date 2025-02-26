@@ -33,6 +33,7 @@ import com.samapp.renttrack.presentation.viewmodels.TenantViewModel
 import java.time.LocalDate
 import com.samapp.renttrack.data.local.model.Result
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,6 +47,7 @@ fun changeTenantDetailScreen(
     val colors = MaterialTheme.colorScheme
 
     LaunchedEffect(tenantId) {
+        delay(500)
         launch(Dispatchers.IO) {
             tenantViewModel.getTenantById(tenantId)
         }

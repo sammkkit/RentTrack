@@ -9,6 +9,7 @@ import com.samapp.renttrack.domain.usecases.Tenants.GetTenantByIdUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.UpdateTenantUseCase
 import javax.inject.Inject
 import android.util.Log
+import com.samapp.renttrack.data.local.model.PaymentType
 
 class AddPaymentHistoryUseCase @Inject constructor(
     private val repository: PaymentHistoryRepository,
@@ -30,16 +31,34 @@ class AddPaymentHistoryUseCase @Inject constructor(
 
             val rent = it.monthlyRent ?: return Result.Error("Monthly rent not set")
             var updatedTenant = it
-
-            if (payment.paymentAmount < rent) {
-                val newDebt = (it.outstandingDebt ?: 0.0) + (rent - payment.paymentAmount)
-                updatedTenant = updatedTenant.copy(outstandingDebt = newDebt)
-                Log.d("AddPaymentHistoryUseCase", "Updated outstandingDebt: $newDebt")
-            } else if (payment.paymentAmount > rent) {
-                val newDeposit = (it.deposit ?: 0.0) + (payment.paymentAmount - rent)
-                updatedTenant = updatedTenant.copy(deposit = newDeposit)
-                Log.d("AddPaymentHistoryUseCase", "Updated deposit: $newDeposit")
+            updatedTenant = when (payment.paymentType) {
+                PaymentType.RENT -> {
+                    when {
+                        payment.paymentAmount < rent -> {
+                            val newDebt = (it.outstandingDebt ?: 0.0) + (rent - payment.paymentAmount)
+                            Log.d("AddPaymentHistoryUseCase", "Updated outstandingDebt: $newDebt")
+                            updatedTenant.copy(outstandingDebt = newDebt)
+                        }
+                        payment.paymentAmount > rent -> {
+                            val newDeposit = (it.deposit ?: 0.0) + (payment.paymentAmount - rent)
+                            Log.d("AddPaymentHistoryUseCase", "Updated deposit: $newDeposit")
+                            updatedTenant.copy(deposit = newDeposit)
+                        }
+                        else -> updatedTenant
+                    }
+                }
+                PaymentType.DEPOSIT -> {
+                    val newDeposit = (it.deposit ?: 0.0 )+ payment.paymentAmount
+                    Log.d("AddPaymentHistoryUseCase", "Updated deposit: $newDeposit")
+                    updatedTenant.copy(deposit = newDeposit)
+                }
+                PaymentType.DEBT -> {
+                    val newDebt = (it.outstandingDebt ?: 0.0) + payment.paymentAmount
+                    Log.d("AddPaymentHistoryUseCase", "Updated outstandingDebt: $newDebt")
+                    updatedTenant.copy(outstandingDebt = newDebt)
+                }
             }
+
 
             updateTenantUseCase.execute(updatedTenant)
             Log.d("AddPaymentHistoryUseCase", "Tenant updated successfully")

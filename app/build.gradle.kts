@@ -42,6 +42,8 @@ android {
 }
 
 dependencies {
+    //Table
+    implementation("com.github.Breens-Mbaka:BeeTablesCompose:1.2.0")
 
     //Room
     implementation(libs.androidx.room.ktx)

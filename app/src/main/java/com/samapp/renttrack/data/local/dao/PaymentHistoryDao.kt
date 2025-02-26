@@ -11,9 +11,9 @@ interface PaymentHistoryDao {
     @Insert
     suspend fun insertPaymentHistory(paymentHistory: PaymentHistory)
 
-    @Query("SELECT * FROM payment_history_table WHERE tenantId = :tenantId ORDER BY paymentForWhichMonth DESC")
+    @Query("SELECT * FROM payment_history_table WHERE tenantId = :tenantId ORDER BY paymentDate DESC")
     suspend fun getPaymentHistoryForTenant(tenantId: Int): List<PaymentHistory>
 
-    @Query("SELECT * FROM payment_history_table ORDER BY paymentForWhichMonth DESC")
+    @Query("SELECT * FROM payment_history_table ORDER BY paymentDate ASC")
     suspend fun getAllPaymentHistory(): List<PaymentHistory>
 }

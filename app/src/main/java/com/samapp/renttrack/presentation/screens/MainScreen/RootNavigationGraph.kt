@@ -20,6 +20,7 @@ import com.samapp.renttrack.presentation.navigation.Screen
 import com.samapp.renttrack.presentation.screens.AddTenantScreen
 import com.samapp.renttrack.presentation.screens.HomeScreen
 import com.samapp.renttrack.presentation.screens.SummaryScreen
+import com.samapp.renttrack.presentation.screens.TransactionHistoryScreen
 import com.samapp.renttrack.presentation.screens.changeTenantDetailScreen
 import com.samapp.renttrack.presentation.screens.tenantDetailScreen
 
@@ -69,7 +70,7 @@ fun RootNavigationGraph(modifier: Modifier, navController: NavHostController) {
         }
 
         composable(
-            route = Screen.TenantDetails.route + "/{tenantId}",
+            route = Screen.TenantDetails.route,
             arguments = listOf(navArgument("tenantId") { type = NavType.IntType }),
             enterTransition = { enterTransition },
             exitTransition = { exitTransition },
@@ -82,7 +83,8 @@ fun RootNavigationGraph(modifier: Modifier, navController: NavHostController) {
                 onBack = { navController.popBackStack() },
                 onUpdate = {tenantId->
                     navController.navigate(Screen.ChangeTenantDetails.createRoute(tenantId))
-                }
+                },
+                navController = navController
             )
         }
 
@@ -98,6 +100,25 @@ fun RootNavigationGraph(modifier: Modifier, navController: NavHostController) {
             changeTenantDetailScreen(
                 tenantId = tenantId,
                 onBack = { navController.popBackStack() }
+            )
+        }
+
+
+        /** 🔹 Transaction Management (Add, Details, Update) */
+        composable(
+            route = Screen.TransactionHistory.route,
+            arguments = listOf(navArgument("tenantId") { type = NavType.IntType }),
+            enterTransition = { enterTransition },
+            exitTransition = { exitTransition },
+            popEnterTransition = { popEnterTransition },
+            popExitTransition = { popExitTransition }
+        ) { backStackEntry ->
+            val tenantId = backStackEntry.arguments?.getInt("tenantId") ?: return@composable
+            TransactionHistoryScreen(
+                tenantId,
+                onBack = {
+                    navController.popBackStack()
+                }
             )
         }
     }
