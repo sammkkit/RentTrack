@@ -25,10 +25,14 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -55,6 +59,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -208,6 +213,9 @@ fun tenantDetailScreen(
                             .padding(padding),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        TenantInfoCard(
+                            tenant
+                        )
                         Text(text = "Name: ${tenant.name}", fontSize = 20.sp)
                         Text(text = "Rent: ${tenant.monthlyRent}", fontSize = 20.sp)
                         Text(text = "Contact: ${tenant.contact}", fontSize = 20.sp)
@@ -254,7 +262,9 @@ fun tenantDetailScreen(
                                             trailingIcon = {
                                                 Icon(Icons.Default.ArrowDropDown, contentDescription = null)
                                             },
-                                            modifier = Modifier.menuAnchor().fillMaxWidth()
+                                            modifier = Modifier
+                                                .menuAnchor()
+                                                .fillMaxWidth()
                                         )
                                         DropdownMenu(
                                             expanded = expanded,
@@ -341,6 +351,63 @@ fun tenantDetailScreen(
                 }
             }
         )
+    }
+}
+@Composable
+fun TenantInfoCard(tenant: Tenant) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Profile Picture",
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Column(
+                modifier = Modifier.padding(16.dp),
+//                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "Name: ${tenant.name}",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+                Text(
+                    "House Number: ${tenant.tenantHouseNumber}",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+                Text(
+                    "Contact: ${tenant.contact}",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+                Text(
+                    "Rent Due Date: ${tenant.rentDueDate}",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+        }
     }
 }
 //@Preview
