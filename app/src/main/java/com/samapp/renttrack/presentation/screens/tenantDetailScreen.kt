@@ -72,6 +72,7 @@ import com.samapp.renttrack.data.local.model.PaymentType
 import com.samapp.renttrack.data.local.model.Result
 import com.samapp.renttrack.data.local.model.Tenant
 import com.samapp.renttrack.presentation.components.MonthSelectionDropDown
+import com.samapp.renttrack.presentation.components.TenantAvatar
 import com.samapp.renttrack.presentation.navigation.Screen
 import com.samapp.renttrack.presentation.viewmodels.PaymentHistoryViewModel
 import com.samapp.renttrack.presentation.viewmodels.TenantViewModel
@@ -216,16 +217,6 @@ fun tenantDetailScreen(
                         TenantInfoCard(
                             tenant
                         )
-                        Text(text = "Name: ${tenant.name}", fontSize = 20.sp)
-                        Text(text = "Rent: ${tenant.monthlyRent}", fontSize = 20.sp)
-                        Text(text = "Contact: ${tenant.contact}", fontSize = 20.sp)
-                        Text(text = "id: ${tenant.id}", fontSize = 20.sp)
-                        Text(text = "email: ${tenant.email}", fontSize = 20.sp)
-                        Text(text = "avatarBackgroundColor: ${tenant.avatarBackgroundColor}", fontSize = 20.sp)
-                        Text(text = "deposit: ${tenant.deposit}", fontSize = 20.sp)
-                        Text(text = "outstandingDebt: ${tenant.outstandingDebt}", fontSize = 20.sp)
-                        Text(text = "tenantHouseNumber: ${tenant.tenantHouseNumber}", fontSize = 20.sp)
-                        Text(text = "filePath: ${tenant.filePath}", fontSize = 20.sp)
                         Button(
                             onClick = { showPaymentDialog = true }, // Open payment dialog
                             modifier = Modifier.fillMaxWidth()
@@ -246,7 +237,13 @@ fun tenantDetailScreen(
                                 Column {
                                     OutlinedTextField(
                                         value = paymentAmount,
-                                        onValueChange = { paymentAmount = it },
+                                        onValueChange = {
+                                            if (it.all { char -> char.isDigit() }) {
+                                                paymentAmount = it
+                                            }else{
+                                                Toast.makeText(context,"Invalid input", Toast.LENGTH_SHORT).show()
+                                            }
+                                        },
                                         label = { Text("Amount") },
                                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                                     )
@@ -370,12 +367,7 @@ fun TenantInfoCard(tenant: Tenant) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Profile Picture",
-                modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
+            TenantAvatar(tenant)
             Column(
                 modifier = Modifier.padding(16.dp),
 //                horizontalAlignment = Alignment.CenterHorizontally
@@ -389,7 +381,7 @@ fun TenantInfoCard(tenant: Tenant) {
                     )
                 )
                 Text(
-                    "House Number: ${tenant.tenantHouseNumber}",
+                    "Rent: ${tenant.monthlyRent}",
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold
                     )
