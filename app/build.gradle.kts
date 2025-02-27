@@ -42,9 +42,9 @@ android {
 }
 
 dependencies {
-    //Table
-    implementation("com.github.Breens-Mbaka:BeeTablesCompose:1.2.0")
-
+    //DataStore
+    implementation(libs.androidx.datastore.preferences.core)
+    implementation("androidx.datastore:datastore-preferences:1.1.3")
     //Room
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)

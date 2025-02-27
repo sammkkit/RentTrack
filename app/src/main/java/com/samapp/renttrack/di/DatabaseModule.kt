@@ -5,6 +5,9 @@ import androidx.room.Room
 import com.samapp.renttrack.data.local.dao.PaymentHistoryDao
 import com.samapp.renttrack.data.local.dao.TenantDao
 import com.samapp.renttrack.data.local.database.AppDatabase
+import com.samapp.renttrack.data.local.datastore.ThemePreferencesDataSource
+import com.samapp.renttrack.data.local.datastore.ThemeRepository
+import com.samapp.renttrack.data.local.datastore.ThemeRepositoryImpl
 import com.samapp.renttrack.data.repository.PaymentHistoryRepository
 import com.samapp.renttrack.data.repository.TenantRepository
 import com.samapp.renttrack.domain.usecases.PaymentHistory.AddPaymentHistoryUseCase
@@ -15,6 +18,8 @@ import com.samapp.renttrack.domain.usecases.Tenants.DeleteTenantUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.GetAllTenantsUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.GetTenantByIdUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.UpdateTenantUseCase
+import com.samapp.renttrack.domain.usecases.Theme.GetThemeUseCase
+import com.samapp.renttrack.domain.usecases.Theme.SaveThemeUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -123,5 +128,31 @@ object DatabaseModule {
     @Singleton
     fun provideGetAllPaymentHistoryUseCase(paymentHistoryRepository: PaymentHistoryRepository): GetAllPaymentHistoryUseCase {
         return GetAllPaymentHistoryUseCase(paymentHistoryRepository)
+    }
+
+
+
+    //Theme Section
+
+    @Provides
+    @Singleton
+    fun provideThemePreferencesDataSource(@ApplicationContext context: Context): ThemePreferencesDataSource {
+        return ThemePreferencesDataSource(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideThemeRepository(dataSource: ThemePreferencesDataSource): ThemeRepository {
+        return ThemeRepositoryImpl(dataSource)
+    }
+
+    @Provides
+    fun provideGetThemeUseCase(repository: ThemeRepository): GetThemeUseCase {
+        return GetThemeUseCase(repository)
+    }
+
+    @Provides
+    fun provideSaveThemeUseCase(repository: ThemeRepository): SaveThemeUseCase {
+        return SaveThemeUseCase(repository)
     }
 }
