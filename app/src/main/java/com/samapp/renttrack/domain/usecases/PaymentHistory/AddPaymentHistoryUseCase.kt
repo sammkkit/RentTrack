@@ -10,6 +10,7 @@ import com.samapp.renttrack.domain.usecases.Tenants.UpdateTenantUseCase
 import javax.inject.Inject
 import android.util.Log
 import com.samapp.renttrack.data.local.model.PaymentType
+import java.time.YearMonth
 
 class AddPaymentHistoryUseCase @Inject constructor(
     private val repository: PaymentHistoryRepository,
@@ -31,6 +32,18 @@ class AddPaymentHistoryUseCase @Inject constructor(
 
             val rent = it.monthlyRent ?: return Result.Error("Monthly rent not set")
             var updatedTenant = it
+
+            if (payment.paymentType == PaymentType.RENT) {
+                val currentMonth = payment.paymentForWhichMonth
+                val existingPayment = repository.getPaymentForMonth(payment.tenantId, currentMonth)
+
+                if (existingPayment != null) {
+                    Log.e("AddPaymentHistoryUseCase", "Rent already collected for $currentMonth")
+                    return Result.Error("Rent for $currentMonth has already been collected.")
+                }
+            }
+
+
             updatedTenant = when (payment.paymentType) {
                 PaymentType.RENT -> {
                     when {

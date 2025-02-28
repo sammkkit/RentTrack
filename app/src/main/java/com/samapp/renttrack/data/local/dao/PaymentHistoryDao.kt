@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.samapp.renttrack.data.local.model.PaymentHistory
+import java.time.YearMonth
 
 @Dao
 interface PaymentHistoryDao {
@@ -16,4 +17,8 @@ interface PaymentHistoryDao {
 
     @Query("SELECT * FROM payment_history_table ORDER BY paymentDate ASC")
     suspend fun getAllPaymentHistory(): List<PaymentHistory>
+
+    @Query("SELECT * FROM payment_history_table WHERE tenantId = :tenantId AND paymentForWhichMonth = :month LIMIT 1")
+    suspend fun getPaymentForMonth(tenantId: Int, month: String): PaymentHistory?
+
 }

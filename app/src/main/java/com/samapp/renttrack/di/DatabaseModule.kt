@@ -13,6 +13,7 @@ import com.samapp.renttrack.data.repository.TenantRepository
 import com.samapp.renttrack.domain.usecases.PaymentHistory.AddPaymentHistoryUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetAllPaymentHistoryUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetPaymentHistoryForTenantUseCase
+import com.samapp.renttrack.domain.usecases.PaymentHistory.GetPaymentInfoForMonthUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.AddTenantUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.DeleteTenantUseCase
 import com.samapp.renttrack.domain.usecases.Tenants.GetAllTenantsUseCase
@@ -129,7 +130,11 @@ object DatabaseModule {
     fun provideGetAllPaymentHistoryUseCase(paymentHistoryRepository: PaymentHistoryRepository): GetAllPaymentHistoryUseCase {
         return GetAllPaymentHistoryUseCase(paymentHistoryRepository)
     }
-
+    @Provides
+    @Singleton
+    fun provideGetPaymentInforForMonthUseCase(paymentHistoryRepository: PaymentHistoryRepository): GetPaymentInfoForMonthUseCase{
+        return GetPaymentInfoForMonthUseCase(paymentHistoryRepository)
+    }
 
 
     //Theme Section

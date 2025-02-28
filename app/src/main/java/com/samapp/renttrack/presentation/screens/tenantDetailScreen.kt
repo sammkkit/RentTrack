@@ -48,6 +48,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -91,15 +92,48 @@ fun tenantDetailScreen(
     val tenantViewModel: TenantViewModel = hiltViewModel()
     val paymentHistoryViewModel: PaymentHistoryViewModel = hiltViewModel()
     val colors = MaterialTheme.colorScheme
+
+    val tenantState by tenantViewModel.tenantState.collectAsState()
+    val currentMonthRentState by paymentHistoryViewModel.currentMonthInfoState.collectAsState()
+    val addPaymentRecordState by paymentHistoryViewModel.addPaymentHistoryState.collectAsState()
+
+    val tenant = (tenantState as? Result.Success<Tenant>)?.data
+    val context = LocalContext.current
+
     LaunchedEffect(tenantId) {
         launch(Dispatchers.IO) {
             tenantViewModel.getTenantById(tenantId)
         }
     }
+    LaunchedEffect(currentMonthRentState) {
+        when (currentMonthRentState) {
+            is Result.Success -> {
+                Toast.makeText(context,"Rent Collected",Toast.LENGTH_SHORT).show()
+            }
 
-    val tenantState by tenantViewModel.tenantState.collectAsState()
-    val tenant = (tenantState as? Result.Success<Tenant>)?.data
-    val context = LocalContext.current
+            is Result.Error -> {
+                Toast.makeText(context,"${(currentMonthRentState as Result.Error).message}",Toast.LENGTH_SHORT).show()
+            }
+
+            else -> Unit
+        }
+    }
+    LaunchedEffect(addPaymentRecordState) {
+        when (addPaymentRecordState) {
+            is Result.Success -> {
+                Toast.makeText(context,"Payment Recorded",Toast.LENGTH_SHORT).show()
+            }
+
+            is Result.Error -> {
+                Toast.makeText(context,"${(addPaymentRecordState as Result.Error).message}",Toast.LENGTH_SHORT).show()
+            }
+
+            else -> Unit
+        }
+    }
+
+
+
 
     var menuExpanded by remember { mutableStateOf(false) }
     var showDeleteDialogBox by remember { mutableStateOf(false) }
@@ -217,11 +251,24 @@ fun tenantDetailScreen(
                         TenantInfoCard(
                             tenant
                         )
-                        Button(
-                            onClick = { showPaymentDialog = true }, // Open payment dialog
-                            modifier = Modifier.fillMaxWidth()
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceAround
                         ) {
-                            Text("Record Payment")
+                            Button(
+                                onClick = {
+                                    paymentHistoryViewModel.payRentForCurrentMonth(tenant)
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Collect Rent")
+                            }
+                            Button(
+                                onClick = { showPaymentDialog = true }, // Open payment dialog
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Record Payment")
+                            }
                         }
 
                     }
@@ -393,7 +440,7 @@ fun TenantInfoCard(tenant: Tenant) {
                     )
                 )
                 Text(
-                    "Rent Due Date: ${tenant.rentDueDate}",
+                    "Rent Due Date: ${tenant.rentDueDate.toString()[tenant.rentDueDate.toString().length-2]}${tenant.rentDueDate.toString()[tenant.rentDueDate.toString().length-1]} of every month",
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold
                     )
