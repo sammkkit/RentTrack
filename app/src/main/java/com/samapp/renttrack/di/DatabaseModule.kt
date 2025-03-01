@@ -8,8 +8,12 @@ import com.samapp.renttrack.data.local.database.AppDatabase
 import com.samapp.renttrack.data.local.datastore.ThemePreferencesDataSource
 import com.samapp.renttrack.data.local.datastore.ThemeRepository
 import com.samapp.renttrack.data.local.datastore.ThemeRepositoryImpl
+import com.samapp.renttrack.data.repository.InvoiceRepositoryImpl
 import com.samapp.renttrack.data.repository.PaymentHistoryRepository
 import com.samapp.renttrack.data.repository.TenantRepository
+import com.samapp.renttrack.domain.repositories.invoice.InvoiceRepository
+import com.samapp.renttrack.domain.usecases.InvoiceUseCases.GenerateInvoiceUseCase
+import com.samapp.renttrack.domain.usecases.InvoiceUseCases.ShareInvoiceUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.AddPaymentHistoryUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetAllPaymentHistoryUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetPaymentHistoryForTenantUseCase
@@ -160,4 +164,27 @@ object DatabaseModule {
     fun provideSaveThemeUseCase(repository: ThemeRepository): SaveThemeUseCase {
         return SaveThemeUseCase(repository)
     }
+
+    //invoice
+    // Provide Invoice Repository
+    @Provides
+    @Singleton
+    fun provideInvoiceRepository(@ApplicationContext context: Context): InvoiceRepository {
+        return InvoiceRepositoryImpl(context)
+    }
+
+    // Provide Generate Invoice Use Case
+    @Provides
+    @Singleton
+    fun provideGenerateInvoiceUseCase(invoiceRepository: InvoiceRepository): GenerateInvoiceUseCase {
+        return GenerateInvoiceUseCase(invoiceRepository)
+    }
+
+    // Provide Share Invoice Use Case
+    @Provides
+    @Singleton
+    fun provideShareInvoiceUseCase(invoiceRepository: InvoiceRepository): ShareInvoiceUseCase {
+        return ShareInvoiceUseCase(invoiceRepository)
+    }
+
 }

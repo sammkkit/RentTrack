@@ -19,6 +19,7 @@ import androidx.navigation.navigation
 import com.samapp.renttrack.presentation.navigation.Screen
 import com.samapp.renttrack.presentation.screens.AddTenantScreen
 import com.samapp.renttrack.presentation.screens.HomeScreen
+import com.samapp.renttrack.presentation.screens.InvoiceScreens.InvoiceScreen
 import com.samapp.renttrack.presentation.screens.SummaryScreen
 import com.samapp.renttrack.presentation.screens.TransactionHistoryScreen
 import com.samapp.renttrack.presentation.screens.changeTenantDetailScreen
@@ -128,5 +129,20 @@ fun RootNavigationGraph(
                 }
             )
         }
+        composable(
+            route = Screen.Invoice.route,
+            arguments = listOf(navArgument("tenantId") { type = NavType.IntType }),
+            enterTransition = { enterTransition },
+            exitTransition = { exitTransition },
+            popEnterTransition = { popEnterTransition },
+            popExitTransition = { popExitTransition }
+        ) { backStackEntry ->
+            val tenantId = backStackEntry.arguments?.getInt("tenantId") ?: return@composable
+            InvoiceScreen(
+                tenantId = tenantId,
+                navController = navController
+            )
+        }
+
     }
 }

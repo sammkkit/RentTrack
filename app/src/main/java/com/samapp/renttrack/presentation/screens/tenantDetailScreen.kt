@@ -258,6 +258,7 @@ fun tenantDetailScreen(
                             Button(
                                 onClick = {
                                     paymentHistoryViewModel.payRentForCurrentMonth(tenant)
+                                    navController.navigate(Screen.Invoice.createRoute(tenantId))
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {

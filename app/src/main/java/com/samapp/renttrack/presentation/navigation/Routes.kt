@@ -19,4 +19,8 @@ sealed class Screen(val route: String) {
     data object TransactionHistory : Screen("transaction_history/{tenantId}"){
         fun createRoute(tenantId: Int) = "transaction_history/$tenantId"
     }
+
+    data object Invoice : Screen("invoice/{tenantId}"){
+        fun createRoute(tenantId: Int) = "invoice/$tenantId"
+    }
 }
