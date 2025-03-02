@@ -2,6 +2,7 @@ package com.samapp.renttrack.data.repository
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
@@ -13,11 +14,26 @@ import com.samapp.renttrack.domain.repositories.invoice.InvoiceRepository
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class InvoiceRepositoryImpl(private val context: Context) : InvoiceRepository {
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences("RentTrackPrefs", Context.MODE_PRIVATE)
 
+    private fun getNextReceiptNumber(): Int {
+        val lastNumber = sharedPreferences.getInt("last_receipt_number", 999)
+        val newNumber = lastNumber + 1
+        sharedPreferences.edit().putInt("last_receipt_number", newNumber).apply()
+        return newNumber
+    }
     override suspend fun generateInvoice(tenant: Tenant,amount: String, rentDate: String): File? {
         Log.d("Invoice", "Generating invoice for ${tenant.name} with amount ₹$amount on $rentDate")
+
+        val receiptNumber = getNextReceiptNumber()
+        val formattedDate = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
+        val fileName = "${tenant.name}_${formattedDate}.pdf"
 
         val pdfDocument = PdfDocument()
         val pageInfo = PdfDocument.PageInfo.Builder(600, 800, 1).create()
@@ -36,16 +52,13 @@ class InvoiceRepositoryImpl(private val context: Context) : InvoiceRepository {
         paint.textSize = 12f
         canvas.drawText("Tenant: ${tenant.name}", 50f, 130f, paint)
         canvas.drawText("Bill Date: ${rentDate}", 50f, 160f, paint)
-        canvas.drawText("Receipt No: 18464393", 50f, 190f, paint)
+        canvas.drawText("Receipt No: ${receiptNumber}", 50f, 190f, paint)
 
         paint.typeface = Typeface.DEFAULT_BOLD
         canvas.drawText("Description", 50f, 230f, paint)
         canvas.drawText("Amount", 400f, 230f, paint)
 
         paint.typeface = Typeface.DEFAULT
-        canvas.drawText("Previous Balance", 50f, 260f, paint)
-        canvas.drawText("₹3,000", 400f, 260f, paint)
-
         canvas.drawText("Paid Amount", 50f, 290f, paint)
         canvas.drawText("₹$amount", 400f, 290f, paint)
 
@@ -57,7 +70,7 @@ class InvoiceRepositoryImpl(private val context: Context) : InvoiceRepository {
 
         paint.typeface = Typeface.DEFAULT_BOLD
         canvas.drawText("Remaining Amount", 50f, 400f, paint)
-        canvas.drawText("₹0.0", 400f, 400f, paint)
+        canvas.drawText("₹${tenant.monthlyRent?.minus(amount.toFloat())}", 400f, 400f, paint)
 
         canvas.drawText("Mode: CASH", 50f, 450f, paint)
         canvas.drawText("Collected By: RentTrack", 50f, 480f, paint)
@@ -75,7 +88,7 @@ class InvoiceRepositoryImpl(private val context: Context) : InvoiceRepository {
         pdfDocument.finishPage(page)
 
         val file =
-            File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RentInvoice.pdf")
+            File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "${fileName}")
         try {
             val outputStream = FileOutputStream(file)
             pdfDocument.writeTo(outputStream)

@@ -83,6 +83,7 @@ import com.samapp.renttrack.util.openPdf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.YearMonth
@@ -111,21 +112,9 @@ fun tenantDetailScreen(
     LaunchedEffect(tenantId) {
         launch(Dispatchers.IO) {
             tenantViewModel.getTenantById(tenantId)
+            delay(1000)
         }
     }
-//    LaunchedEffect(currentMonthRentState) {
-//        when (currentMonthRentState) {
-//            is Result.Success -> {
-//                Toast.makeText(context,"Rent Collected",Toast.LENGTH_SHORT).show()
-//            }
-//
-//            is Result.Error -> {
-//                Toast.makeText(context,"${(currentMonthRentState as Result.Error).message}",Toast.LENGTH_SHORT).show()
-//            }
-//
-//            else -> Unit
-//        }
-//    }
     LaunchedEffect(addPaymentRecordState) {
         when (addPaymentRecordState) {
             is Result.Success -> {
@@ -139,10 +128,6 @@ fun tenantDetailScreen(
             else -> Unit
         }
     }
-
-
-
-
     var menuExpanded by remember { mutableStateOf(false) }
     var showDeleteDialogBox by remember { mutableStateOf(false) }
     Scaffold(
