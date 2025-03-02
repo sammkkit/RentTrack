@@ -11,7 +11,6 @@ import java.io.File
 
 class GenerateInvoiceUseCase(private val invoiceRepository: InvoiceRepository) {
     fun execute(tenant: Tenant, amount: String, rentDate: String): Flow<File?> = flow {
-        delay(2000)
         val file = invoiceRepository.generateInvoice(tenant, amount, rentDate)
         emit(file)
     }.flowOn(Dispatchers.IO)

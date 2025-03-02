@@ -1,6 +1,7 @@
 package com.samapp.renttrack.presentation.screens
 
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -75,10 +76,15 @@ import com.samapp.renttrack.data.local.model.Tenant
 import com.samapp.renttrack.presentation.components.MonthSelectionDropDown
 import com.samapp.renttrack.presentation.components.TenantAvatar
 import com.samapp.renttrack.presentation.navigation.Screen
+import com.samapp.renttrack.presentation.viewmodels.InvoiceViewModel
 import com.samapp.renttrack.presentation.viewmodels.PaymentHistoryViewModel
 import com.samapp.renttrack.presentation.viewmodels.TenantViewModel
+import com.samapp.renttrack.util.openPdf
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,6 +97,7 @@ fun tenantDetailScreen(
 ) {
     val tenantViewModel: TenantViewModel = hiltViewModel()
     val paymentHistoryViewModel: PaymentHistoryViewModel = hiltViewModel()
+    val invoiceViewModel: InvoiceViewModel = hiltViewModel()
     val colors = MaterialTheme.colorScheme
 
     val tenantState by tenantViewModel.tenantState.collectAsState()
@@ -99,25 +106,26 @@ fun tenantDetailScreen(
 
     val tenant = (tenantState as? Result.Success<Tenant>)?.data
     val context = LocalContext.current
+    val invoiceFile = invoiceViewModel.invoiceFile.collectAsState()
 
     LaunchedEffect(tenantId) {
         launch(Dispatchers.IO) {
             tenantViewModel.getTenantById(tenantId)
         }
     }
-    LaunchedEffect(currentMonthRentState) {
-        when (currentMonthRentState) {
-            is Result.Success -> {
-                Toast.makeText(context,"Rent Collected",Toast.LENGTH_SHORT).show()
-            }
-
-            is Result.Error -> {
-                Toast.makeText(context,"${(currentMonthRentState as Result.Error).message}",Toast.LENGTH_SHORT).show()
-            }
-
-            else -> Unit
-        }
-    }
+//    LaunchedEffect(currentMonthRentState) {
+//        when (currentMonthRentState) {
+//            is Result.Success -> {
+//                Toast.makeText(context,"Rent Collected",Toast.LENGTH_SHORT).show()
+//            }
+//
+//            is Result.Error -> {
+//                Toast.makeText(context,"${(currentMonthRentState as Result.Error).message}",Toast.LENGTH_SHORT).show()
+//            }
+//
+//            else -> Unit
+//        }
+//    }
     LaunchedEffect(addPaymentRecordState) {
         when (addPaymentRecordState) {
             is Result.Success -> {
@@ -258,7 +266,32 @@ fun tenantDetailScreen(
                             Button(
                                 onClick = {
                                     paymentHistoryViewModel.payRentForCurrentMonth(tenant)
-                                    navController.navigate(Screen.Invoice.createRoute(tenantId))
+                                    Log.d("Invoice", "Rent payment recorded for ${tenant.name}")
+                                    when (currentMonthRentState) {
+                                        is Result.Success -> {
+                                            CoroutineScope(Dispatchers.Main).launch {
+                                                Log.d("Invoice", "Starting invoice generation for ${tenant.name}")
+
+                                                val invoice = invoiceViewModel.generateInvoice(
+                                                    tenant,
+                                                    tenant.monthlyRent.toString(),
+                                                    tenant.rentDueDate.toString()
+                                                )
+                                                Toast.makeText(context,"Rent Collected",Toast.LENGTH_SHORT).show()
+                                                if (invoice != null) {
+                                                    Log.d("Invoice", "Invoice successfully generated: ${invoice.absolutePath}")
+                                                    openPdf(context, invoice) // Open the PDF once it's ready
+                                                } else {
+                                                    Log.e("Invoice", "Invoice generation failed!")
+                                                }
+                                            }
+                                        }
+                                        is Result.Error -> {
+                                            Toast.makeText(context,"${(currentMonthRentState as Result.Error).message}",Toast.LENGTH_SHORT).show()
+                                        }
+                                        else -> Unit
+                                    }
+
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
