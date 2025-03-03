@@ -10,7 +10,7 @@ import android.os.Environment
 import android.util.Log
 import androidx.core.content.FileProvider
 import com.samapp.renttrack.data.local.model.Tenant
-import com.samapp.renttrack.domain.repositories.invoice.InvoiceRepository
+import com.samapp.renttrack.domain.repositories.invoice.RentInvoiceRepository
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class InvoiceRepositoryImpl(private val context: Context) : InvoiceRepository {
+class RentInvoiceRepositoryImpl(private val context: Context) : RentInvoiceRepository {
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("RentTrackPrefs", Context.MODE_PRIVATE)
 

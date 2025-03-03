@@ -12,7 +12,9 @@ import com.samapp.renttrack.domain.usecases.PaymentHistory.GetAllPaymentHistoryU
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetPaymentHistoryForTenantUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetPaymentInfoForMonthUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 
@@ -33,9 +35,9 @@ class PaymentHistoryViewModel @Inject constructor(
     private val _currentMonthInfoState = MutableStateFlow<Result<Unit>>(Result.Loading())
     val currentMonthInfoState: StateFlow<Result<Unit>> = _currentMonthInfoState
 
-    private val _addPaymentHistoryState = MutableStateFlow<Result<Unit>>(Result.Loading())
-    val addPaymentHistoryState: StateFlow<Result<Unit>> = _addPaymentHistoryState
 
+    private val _addPaymentHistoryEvent = MutableSharedFlow<Result<Unit>>()
+    val addPaymentHistoryEvent = _addPaymentHistoryEvent.asSharedFlow()
 
     fun payRentForCurrentMonth(tenant: Tenant){
         viewModelScope.launch {
@@ -62,12 +64,12 @@ class PaymentHistoryViewModel @Inject constructor(
 
     fun addPaymentHistory(paymentHistory: PaymentHistory) {
         viewModelScope.launch {
-            _addPaymentHistoryState.value = Result.Loading()
             val result = addPaymentHistoryUseCase(paymentHistory)
             if (result is Result.Success<*>) {
                 getPaymentHistoryForTenant(paymentHistory.tenantId)
+                _addPaymentHistoryEvent.emit(Result.Success(Unit))
             } else {
-                _addPaymentHistoryState.value = Result.Error("${(result as Result.Error).message}")
+                _addPaymentHistoryEvent.emit(Result.Error("${(result as Result.Error).message}" ?: "Unknown error"))
             }
         }
     }

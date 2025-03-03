@@ -78,7 +78,7 @@ fun InvoiceScreen(
                     Text("Rent Amount: ${tenant.monthlyRent}")
                     Text("Due Date: ${tenant.rentDueDate}")
                     Spacer(Modifier.height(20.dp))
-//                    Button(onClick = { invoiceViewModel.generateInvoice(
+//                    Button(onClick = { invoiceViewModel.generateRentInvoice(
 //                        tenant = tenant,
 //                        amount = tenant.monthlyRent.toString(),
 //                        rentDate = tenant.rentDueDate.toString()

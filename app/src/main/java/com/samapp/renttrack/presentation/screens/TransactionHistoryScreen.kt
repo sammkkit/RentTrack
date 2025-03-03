@@ -1,5 +1,6 @@
 package com.samapp.renttrack.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,8 +22,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.samapp.renttrack.data.local.model.PaymentHistory
 import com.samapp.renttrack.data.local.model.PaymentType
 import com.samapp.renttrack.data.local.model.Result
+import com.samapp.renttrack.presentation.viewmodels.InvoiceViewModel
 import com.samapp.renttrack.presentation.viewmodels.PaymentHistoryViewModel
+import com.samapp.renttrack.util.openPdf
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 
 data class Sample(
@@ -43,7 +50,9 @@ fun TransactionHistoryScreen(
     }
 
     val transactionsState by viewModel.paymentHistoryState.collectAsState()
-
+    val context = LocalContext.current
+    val invoiceViewModel:InvoiceViewModel = hiltViewModel()
+    val transactions = (transactionsState as? Result.Success<List<PaymentHistory>>)?.data
     Scaffold(
         topBar = {
             SmallTopAppBar(
@@ -64,7 +73,25 @@ fun TransactionHistoryScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* Implement Share Functionality */ },
+                onClick = {
+                    //TODO-trying to implement opening transaction invoice
+                    CoroutineScope(Dispatchers.Main).launch{
+                        val file = invoiceViewModel.generateTransactionInvoice(transactions = transactions)
+
+                        if (file != null) {
+                            Log.d(
+                                "Invoice",
+                                "Invoice successfully generated: ${file.absolutePath}"
+                            )
+                            openPdf(
+                                context,
+                                file
+                            )
+                        } else {
+                            Log.e("Invoice", "Invoice generation failed!")
+                        }
+                    }
+                },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {

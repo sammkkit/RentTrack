@@ -22,18 +22,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -49,7 +43,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -63,7 +56,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -82,10 +74,9 @@ import com.samapp.renttrack.presentation.viewmodels.TenantViewModel
 import com.samapp.renttrack.util.openPdf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,7 +94,7 @@ fun tenantDetailScreen(
 
     val tenantState by tenantViewModel.tenantState.collectAsState()
     val currentMonthRentState by paymentHistoryViewModel.currentMonthInfoState.collectAsState()
-    val addPaymentRecordState by paymentHistoryViewModel.addPaymentHistoryState.collectAsState()
+
 
     val tenant = (tenantState as? Result.Success<Tenant>)?.data
     val context = LocalContext.current
@@ -115,17 +106,19 @@ fun tenantDetailScreen(
             delay(1000)
         }
     }
-    LaunchedEffect(addPaymentRecordState) {
-        when (addPaymentRecordState) {
-            is Result.Success -> {
-                Toast.makeText(context,"Payment Recorded",Toast.LENGTH_SHORT).show()
-            }
+    LaunchedEffect(Unit) {
+        paymentHistoryViewModel.addPaymentHistoryEvent.collectLatest { result ->
+            when (result) {
+                is Result.Success -> {
+                    Toast.makeText(context, "Payment Recorded", Toast.LENGTH_SHORT).show()
+                }
 
-            is Result.Error -> {
-                Toast.makeText(context,"${(addPaymentRecordState as Result.Error).message}",Toast.LENGTH_SHORT).show()
-            }
+                is Result.Error -> {
+                    Toast.makeText(context, result.message, Toast.LENGTH_SHORT).show()
+                }
 
-            else -> Unit
+                is Result.Loading -> Unit
+            }
         }
     }
     LaunchedEffect(currentMonthRentState) {
@@ -143,7 +136,7 @@ fun tenantDetailScreen(
                     )
 
                     val invoice = tenant?.let {
-                        invoiceViewModel.generateInvoice(
+                        invoiceViewModel.generateRentInvoice(
                             it,
                             tenant.monthlyRent.toString(),
                             tenant.rentDueDate.toString()

@@ -8,11 +8,14 @@ import com.samapp.renttrack.data.local.database.AppDatabase
 import com.samapp.renttrack.data.local.datastore.ThemePreferencesDataSource
 import com.samapp.renttrack.data.local.datastore.ThemeRepository
 import com.samapp.renttrack.data.local.datastore.ThemeRepositoryImpl
-import com.samapp.renttrack.data.repository.InvoiceRepositoryImpl
+import com.samapp.renttrack.data.repository.RentInvoiceRepositoryImpl
 import com.samapp.renttrack.data.repository.PaymentHistoryRepository
 import com.samapp.renttrack.data.repository.TenantRepository
-import com.samapp.renttrack.domain.repositories.invoice.InvoiceRepository
+import com.samapp.renttrack.data.repository.TransactionInvoiceRepositoryImpl
+import com.samapp.renttrack.domain.repositories.invoice.RentInvoiceRepository
+import com.samapp.renttrack.domain.repositories.invoice.TransactionInvoiceRepository
 import com.samapp.renttrack.domain.usecases.InvoiceUseCases.GenerateInvoiceUseCase
+import com.samapp.renttrack.domain.usecases.InvoiceUseCases.GenerateTransactionInvoiceUseCase
 import com.samapp.renttrack.domain.usecases.InvoiceUseCases.ShareInvoiceUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.AddPaymentHistoryUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetAllPaymentHistoryUseCase
@@ -169,21 +172,32 @@ object DatabaseModule {
     // Provide Invoice Repository
     @Provides
     @Singleton
-    fun provideInvoiceRepository(@ApplicationContext context: Context): InvoiceRepository {
-        return InvoiceRepositoryImpl(context)
+    fun provideInvoiceRepository(@ApplicationContext context: Context): RentInvoiceRepository {
+        return RentInvoiceRepositoryImpl(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTransactionInvoiceRepository(@ApplicationContext context: Context): TransactionInvoiceRepository{
+        return TransactionInvoiceRepositoryImpl(context)
     }
 
     // Provide Generate Invoice Use Case
     @Provides
     @Singleton
-    fun provideGenerateInvoiceUseCase(invoiceRepository: InvoiceRepository): GenerateInvoiceUseCase {
+    fun provideGenerateInvoiceUseCase(invoiceRepository: RentInvoiceRepository): GenerateInvoiceUseCase {
         return GenerateInvoiceUseCase(invoiceRepository)
+    }
+    @Provides
+    @Singleton
+    fun provideGenerateTransactionInvoiceUseCase(transactionInvoiceRepo: TransactionInvoiceRepository):GenerateTransactionInvoiceUseCase{
+        return GenerateTransactionInvoiceUseCase(transactionInvoiceRepo)
     }
 
     // Provide Share Invoice Use Case
     @Provides
     @Singleton
-    fun provideShareInvoiceUseCase(invoiceRepository: InvoiceRepository): ShareInvoiceUseCase {
+    fun provideShareInvoiceUseCase(invoiceRepository: RentInvoiceRepository): ShareInvoiceUseCase {
         return ShareInvoiceUseCase(invoiceRepository)
     }
 
