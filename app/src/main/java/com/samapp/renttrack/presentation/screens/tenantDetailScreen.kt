@@ -128,6 +128,45 @@ fun tenantDetailScreen(
             else -> Unit
         }
     }
+    LaunchedEffect(currentMonthRentState) {
+        when (currentMonthRentState) {
+            is Result.Error -> {
+                Toast.makeText(context,"${(currentMonthRentState as Result.Error).message}",Toast.LENGTH_SHORT).show()
+
+            }
+            is Result.Success -> {
+                Toast.makeText(context,"Rent Collected",Toast.LENGTH_SHORT).show()
+                CoroutineScope(Dispatchers.Main).launch {
+                    Log.d(
+                        "Invoice",
+                        "Starting invoice generation for ${tenant?.name}"
+                    )
+
+                    val invoice = tenant?.let {
+                        invoiceViewModel.generateInvoice(
+                            it,
+                            tenant.monthlyRent.toString(),
+                            tenant.rentDueDate.toString()
+                        )
+                    }
+
+                    if (invoice != null) {
+                        Log.d(
+                            "Invoice",
+                            "Invoice successfully generated: ${invoice.absolutePath}"
+                        )
+                        openPdf(
+                            context,
+                            invoice
+                        ) // Open the PDF once it's ready
+                    } else {
+                        Log.e("Invoice", "Invoice generation failed!")
+                    }
+                }
+            }
+            else ->Unit
+        }
+    }
     var menuExpanded by remember { mutableStateOf(false) }
     var showDeleteDialogBox by remember { mutableStateOf(false) }
     Scaffold(
@@ -251,31 +290,6 @@ fun tenantDetailScreen(
                             Button(
                                 onClick = {
                                     paymentHistoryViewModel.payRentForCurrentMonth(tenant)
-                                    Log.d("Invoice", "Rent payment recorded for ${tenant.name}")
-                                    when (currentMonthRentState) {
-                                        is Result.Success -> {
-                                            CoroutineScope(Dispatchers.Main).launch {
-                                                Log.d("Invoice", "Starting invoice generation for ${tenant.name}")
-
-                                                val invoice = invoiceViewModel.generateInvoice(
-                                                    tenant,
-                                                    tenant.monthlyRent.toString(),
-                                                    tenant.rentDueDate.toString()
-                                                )
-                                                Toast.makeText(context,"Rent Collected",Toast.LENGTH_SHORT).show()
-                                                if (invoice != null) {
-                                                    Log.d("Invoice", "Invoice successfully generated: ${invoice.absolutePath}")
-                                                    openPdf(context, invoice) // Open the PDF once it's ready
-                                                } else {
-                                                    Log.e("Invoice", "Invoice generation failed!")
-                                                }
-                                            }
-                                        }
-                                        is Result.Error -> {
-                                            Toast.makeText(context,"${(currentMonthRentState as Result.Error).message}",Toast.LENGTH_SHORT).show()
-                                        }
-                                        else -> Unit
-                                    }
 
                                 },
                                 modifier = Modifier.weight(1f)
