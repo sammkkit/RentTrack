@@ -19,4 +19,5 @@ fun openPdf(context: Context, file: File) {
     } catch (e: Exception) {
         Log.e("Invoice", "Error opening PDF: ${e.message}")
         e.printStackTrace()
-    }}
+    }
+}

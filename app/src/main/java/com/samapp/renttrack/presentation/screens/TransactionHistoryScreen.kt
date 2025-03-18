@@ -1,13 +1,17 @@
 package com.samapp.renttrack.presentation.screens
 
+import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,11 +28,15 @@ import com.samapp.renttrack.data.local.model.PaymentType
 import com.samapp.renttrack.data.local.model.Result
 import com.samapp.renttrack.presentation.viewmodels.InvoiceViewModel
 import com.samapp.renttrack.presentation.viewmodels.PaymentHistoryViewModel
+import com.samapp.renttrack.util.generateInvoiceFileName
 import com.samapp.renttrack.util.openPdf
+import com.samapp.renttrack.util.sharePDF
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import java.time.format.DateTimeFormatter
 
 data class Sample(
@@ -72,31 +80,67 @@ fun TransactionHistoryScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    //TODO-trying to implement opening transaction invoice
-                    CoroutineScope(Dispatchers.Main).launch{
-                        val file = invoiceViewModel.generateTransactionInvoice(transactions = transactions)
-
-                        if (file != null) {
-                            Log.d(
-                                "Invoice",
-                                "Invoice successfully generated: ${file.absolutePath}"
-                            )
-                            openPdf(
-                                context,
-                                file
-                            )
-                        } else {
-                            Log.e("Invoice", "Invoice generation failed!")
-                        }
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.End
             ) {
-                Icon(imageVector = Icons.Default.Share, contentDescription = "Share")
+                // Download FAB
+                FloatingActionButton(
+                    onClick = {
+                        if(transactions== null){
+                            Toast.makeText(context, "No transactions found", Toast.LENGTH_SHORT).show()
+                            return@FloatingActionButton
+                        }
+                        CoroutineScope(Dispatchers.Main).launch {
+                            val fileName = generateInvoiceFileName(transactions) // Unique name based on transactions
+                            val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "$fileName.pdf")
+
+                            if (file.exists()) {
+                                Log.d("Invoice", "Reusing existing invoice: ${file.absolutePath}")
+                                openPdf(context, file)
+                            } else {
+                                val newFile = invoiceViewModel.generateTransactionInvoice(transactions)
+                                if (newFile != null) {
+                                    Log.d("Invoice", "Invoice saved: ${newFile.absolutePath}")
+                                    withContext(Dispatchers.Main) {
+                                        Toast.makeText(context, "Invoice downloaded", Toast.LENGTH_SHORT).show()
+                                    }
+                                    openPdf(context, newFile)
+                                } else {
+                                    Log.e("Invoice", "Invoice generation failed!")
+                                }
+                            }
+                        }
+                    },
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
+                ) {
+                    Icon(imageVector = Icons.Default.AddCircle, contentDescription = "Download")
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+                // Share FAB
+                FloatingActionButton(
+                    onClick = {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            val file = invoiceViewModel.generateTransactionInvoice(transactions = transactions)
+                            if (file != null) {
+                                Log.d("Invoice", "Invoice successfully generated: ${file.absolutePath}")
+                                sharePDF(context, file)
+                            } else {
+                                Log.e("Invoice", "Invoice generation failed!")
+                            }
+                        }
+                    },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(imageVector = Icons.Default.Share, contentDescription = "Share")
+                }
             }
+
         }
     ) { paddingValues ->
         Column(

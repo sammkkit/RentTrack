@@ -13,6 +13,7 @@ import com.samapp.renttrack.data.local.model.PaymentHistory
 import com.samapp.renttrack.data.local.model.Tenant
 import com.samapp.renttrack.domain.repositories.invoice.RentInvoiceRepository
 import com.samapp.renttrack.domain.repositories.invoice.TransactionInvoiceRepository
+import com.samapp.renttrack.util.generateInvoiceFileName
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -34,13 +35,13 @@ class TransactionInvoiceRepositoryImpl(
     }
 
     override suspend fun generateInvoice(transactions: List<PaymentHistory>?): File? {
-
         val receiptNumber = getNextReceiptNumber()
         val formattedDate = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
-        val fileName = "${receiptNumber}_Transaction_${formattedDate}.pdf"
+        val fileNameWithoutExtension = generateInvoiceFileName(transactions!!)
+        val fileName = "${fileNameWithoutExtension}.pdf"
 
         val pdfDocument = PdfDocument()
-        val pageInfo = PdfDocument.PageInfo.Builder(600, 1000, 1).create()
+        val pageInfo = PdfDocument.PageInfo.Builder(600, 1200, 1).create()
         val page = pdfDocument.startPage(pageInfo)
         val canvas = page.canvas
         val paint = Paint()
@@ -53,47 +54,49 @@ class TransactionInvoiceRepositoryImpl(
         paint.color = Color.WHITE
         paint.textSize = 24f
         paint.typeface = Typeface.DEFAULT_BOLD
-        canvas.drawText("Transaction History", 180f, 50f, paint)
+        canvas.drawText("Transaction Invoice", 180f, 50f, paint)
 
         // Column Titles
         paint.color = Color.LTGRAY
-        canvas.drawRect(0f, 90f, 600f, 130f, paint)
+        canvas.drawRect(0f, 90f, 600f, 140f, paint)
 
         paint.color = Color.BLACK
         paint.textSize = 16f
         paint.typeface = Typeface.DEFAULT_BOLD
-        canvas.drawText("DATE", 40f, 120f, paint)
-        canvas.drawText("AMOUNT", 220f, 120f, paint)
-        canvas.drawText("TYPE", 420f, 120f, paint)
+        canvas.drawText("DATE", 20f, 130f, paint)
+        canvas.drawText("MONTH", 140f, 130f, paint)
+        canvas.drawText("TENANT ID", 260f, 130f, paint)
+        canvas.drawText("AMOUNT", 400f, 130f, paint)
+        canvas.drawText("TYPE", 520f, 130f, paint)
 
-        var yPosition = 150f
-        if (transactions != null) {
-            transactions.forEach { transaction ->
-                paint.textSize = 14f
-                paint.typeface = Typeface.DEFAULT
-                paint.color = Color.BLACK
-                canvas.drawText(transaction.paymentDate.toString(), 40f, yPosition, paint)
+        var yPosition = 160f
+        transactions?.forEach { transaction ->
+            paint.textSize = 14f
+            paint.typeface = Typeface.DEFAULT
+            paint.color = Color.BLACK
+            canvas.drawText(transaction.paymentDate.toString(), 20f, yPosition, paint)
+            canvas.drawText(transaction.paymentForWhichMonth.toString(), 140f, yPosition, paint)
+            canvas.drawText(transaction.tenantId.toString(), 260f, yPosition, paint)
 
-                // Amount Formatting
-                val amountText = if (transaction.paymentAmount > 0) "+ ₹${transaction.paymentAmount}" else "- ₹${-transaction.paymentAmount}"
-                paint.color = if (transaction.paymentAmount > 0) Color.BLUE else Color.RED
-                canvas.drawText(amountText, 220f, yPosition, paint)
+            // Amount Formatting
+            val amountText = "₹${transaction.paymentAmount}"
+            paint.color = if (transaction.paymentAmount > 0) Color.BLUE else Color.RED
+            canvas.drawText(amountText, 400f, yPosition, paint)
 
-                // Type Background
-                paint.color = if (transaction.paymentAmount > 0) Color.GREEN else Color.RED
-                canvas.drawRect(400f, yPosition - 20f, 550f, yPosition + 10f, paint)
+            // Type Box
+            paint.color = if (transaction.paymentAmount > 0) Color.GREEN else Color.RED
+            canvas.drawRect(500f, yPosition - 15f, 580f, yPosition + 10f, paint)
 
-                // Type Text
-                paint.color = Color.WHITE
-                canvas.drawText(if (transaction.paymentAmount > 0) "DEPOSIT" else "DEBT", 420f, yPosition, paint)
+            // Type Text
+            paint.color = Color.WHITE
+            canvas.drawText(transaction.paymentType.name, 520f, yPosition, paint)
 
-                yPosition += 40f
-            }
+            yPosition += 40f
         }
 
         pdfDocument.finishPage(page)
 
-        val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "$fileName")
+        val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
         return try {
             val outputStream = FileOutputStream(file)
             pdfDocument.writeTo(outputStream)
@@ -105,6 +108,7 @@ class TransactionInvoiceRepositoryImpl(
             null
         }
     }
+
 
     override fun shareInvoice(context: Context, file: File) {
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
