@@ -1,6 +1,7 @@
 package com.samapp.renttrack.presentation.viewmodels
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.samapp.renttrack.data.local.model.PaymentHistory
 import com.samapp.renttrack.data.local.model.Tenant
@@ -38,6 +39,7 @@ class InvoiceViewModel @Inject constructor(
 
         return withContext(Dispatchers.IO) {
             val file = generateInvoiceUseCase.execute(tenant, amount, rentDate).firstOrNull()
+            Log.d("Invoice","viewmodel - ${file}")
             _invoiceFile.value = file
             _isLoading.value = false
             file

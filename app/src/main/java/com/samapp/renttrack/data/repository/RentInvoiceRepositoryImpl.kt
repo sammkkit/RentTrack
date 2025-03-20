@@ -5,16 +5,26 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Paint
 import android.graphics.Typeface
-import android.graphics.pdf.PdfDocument
 import android.os.Environment
 import android.util.Log
 import androidx.core.content.FileProvider
+import com.itextpdf.forms.PdfAcroForm
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfReader
+import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor
+import com.itextpdf.kernel.pdf.canvas.parser.listener.SimpleTextExtractionStrategy
+import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Paragraph
 import com.samapp.renttrack.data.local.model.Tenant
 import com.samapp.renttrack.domain.repositories.invoice.RentInvoiceRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 
@@ -28,6 +38,52 @@ class RentInvoiceRepositoryImpl(private val context: Context) : RentInvoiceRepos
         sharedPreferences.edit().putInt("last_receipt_number", newNumber).apply()
         return newNumber
     }
+//    override suspend fun generateInvoice(tenant: Tenant,amount: String, rentDate: String): File?{
+//        try {
+//            // Load the blank template from assets
+//            val assetManager = context.assets
+//            val templateInputStream = assetManager.open("fillable_invoice.pdf")
+//            val assetFiles = context.assets.list("")?.toList()
+//            Log.d("Assets", "Files: $assetFiles")
+//
+//            // Create output file
+//            val outputDir = File(context.getExternalFilesDir(null), "Invoices")
+//            if (!outputDir.exists()) outputDir.mkdirs()
+//            val outputFile = File(outputDir, "Invoice_${System.currentTimeMillis()}.pdf")
+//
+//            val pdfReader = PdfReader(templateInputStream)
+//            val pdfWriter = PdfWriter(FileOutputStream(outputFile))
+//            val pdfDocument = PdfDocument(pdfReader, pdfWriter)
+//
+////            val document = Document(pdfDocument)
+////            val invoiceNo = getNextReceiptNumber()
+////            // Read the entire PDF text and replace placeholders
+////            val pdfContent = StringBuilder()
+////            val strategy = SimpleTextExtractionStrategy()
+////            for (i in 1..pdfDocument.numberOfPages) {
+////                pdfContent.append(PdfTextExtractor.getTextFromPage(pdfDocument.getPage(i), strategy))
+////            }
+//
+//            val form = PdfAcroForm.getAcroForm(pdfDocument, true)
+//            if (form != null) {
+//                form.getField("TenantName")?.setValue(tenant.name)
+//                form.getField("invoiceNo")?.setValue(getNextReceiptNumber().toString())
+//                form.getField("RentAmount")?.setValue(tenant.monthlyRent.toString())
+//                form.getField("DueAmount")?.setValue(tenant.outstandingDebt.toString())
+//                form.getField("DepositAmount")?.setValue(tenant.deposit.toString())
+//                form.getField("InvoiceDate")?.setValue(LocalDate.now().toString())
+//
+//                val total = tenant.monthlyRent!! - tenant.outstandingDebt!! + tenant.deposit!!
+//                form.getField("TOTAL")?.setValue(total.toString())
+//            }
+//            form.flattenFields()
+//            pdfDocument.close()
+//            return outputFile
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            return null
+//        }
+//    }
     override suspend fun generateInvoice(tenant: Tenant,amount: String, rentDate: String): File? {
         Log.d("Invoice", "Generating invoice for ${tenant.name} with amount ₹$amount on $rentDate")
 
@@ -35,8 +91,8 @@ class RentInvoiceRepositoryImpl(private val context: Context) : RentInvoiceRepos
         val formattedDate = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
         val fileName = "${tenant.name}_${formattedDate}.pdf"
 
-        val pdfDocument = PdfDocument()
-        val pageInfo = PdfDocument.PageInfo.Builder(600, 800, 1).create()
+        val pdfDocument = android.graphics.pdf.PdfDocument()
+        val pageInfo = android.graphics.pdf.PdfDocument.PageInfo.Builder(600, 800, 1).create()
         val page = pdfDocument.startPage(pageInfo)
         val canvas = page.canvas
         val paint = Paint()
@@ -51,7 +107,7 @@ class RentInvoiceRepositoryImpl(private val context: Context) : RentInvoiceRepos
 
         paint.textSize = 12f
         canvas.drawText("Tenant: ${tenant.name}", 50f, 130f, paint)
-        canvas.drawText("Bill Date: ${rentDate}", 50f, 160f, paint)
+        canvas.drawText("Bill Date: ${LocalDate.now()}", 50f, 160f, paint)
         canvas.drawText("Receipt No: ${receiptNumber}", 50f, 190f, paint)
 
         paint.typeface = Typeface.DEFAULT_BOLD
@@ -62,15 +118,18 @@ class RentInvoiceRepositoryImpl(private val context: Context) : RentInvoiceRepos
         canvas.drawText("Paid Amount", 50f, 290f, paint)
         canvas.drawText("₹$amount", 400f, 290f, paint)
 
-        canvas.drawText("Discount", 50f, 320f, paint)
-        canvas.drawText("₹0", 400f, 320f, paint)
+        canvas.drawText("Debt", 50f, 320f, paint)
+        canvas.drawText("₹${tenant.outstandingDebt}", 400f, 320f, paint)
 
-        canvas.drawText("Net", 50f, 350f, paint)
-        canvas.drawText("₹$amount", 400f, 350f, paint)
+        canvas.drawText("Deposit", 50f, 350f, paint)
+        canvas.drawText("₹${tenant.deposit}", 400f, 350f, paint)
 
-        paint.typeface = Typeface.DEFAULT_BOLD
+        val remainingAmount = tenant.deposit?.minus((tenant.outstandingDebt ?: 0.0))
+    paint.typeface = Typeface.DEFAULT_BOLD
         canvas.drawText("Remaining Amount", 50f, 400f, paint)
-        canvas.drawText("₹${tenant.monthlyRent?.minus(amount.toFloat())}", 400f, 400f, paint)
+        canvas.drawText("₹${
+            remainingAmount
+        }", 400f, 400f, paint)
 
         canvas.drawText("Mode: CASH", 50f, 450f, paint)
         canvas.drawText("Collected By: RentTrack", 50f, 480f, paint)

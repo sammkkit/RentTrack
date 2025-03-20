@@ -84,12 +84,13 @@ class TransactionInvoiceRepositoryImpl(
             canvas.drawText(amountText, 400f, yPosition, paint)
 
             // Type Box
-            paint.color = if (transaction.paymentAmount > 0) Color.GREEN else Color.RED
+            paint.color = if (transaction.paymentType.name.lowercase() == "debt") Color.RED else Color.GREEN
             canvas.drawRect(500f, yPosition - 15f, 580f, yPosition + 10f, paint)
 
             // Type Text
             paint.color = Color.WHITE
             canvas.drawText(transaction.paymentType.name, 520f, yPosition, paint)
+
 
             yPosition += 40f
         }

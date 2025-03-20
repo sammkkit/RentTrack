@@ -19,10 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.samapp.renttrack.R
 import com.samapp.renttrack.data.local.model.PaymentHistory
 import com.samapp.renttrack.data.local.model.PaymentType
 import com.samapp.renttrack.data.local.model.Result
@@ -117,7 +119,11 @@ fun TransactionHistoryScreen(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onSecondary
                 ) {
-                    Icon(imageVector = Icons.Default.AddCircle, contentDescription = "Download")
+                    Icon(
+                        painter = painterResource(R.drawable.downloads),
+                        contentDescription = "Download",
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))

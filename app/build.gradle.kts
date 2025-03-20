@@ -42,9 +42,13 @@ android {
 }
 
 dependencies {
+
+    //itext
+    implementation(libs.itext7.core)
+
     //DataStore
     implementation(libs.androidx.datastore.preferences.core)
-    implementation("androidx.datastore:datastore-preferences:1.1.3")
+    implementation(libs.androidx.datastore.preferences)
     //Room
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
