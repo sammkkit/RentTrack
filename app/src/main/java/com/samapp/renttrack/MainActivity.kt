@@ -3,6 +3,7 @@ package com.samapp.renttrack
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,9 +11,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,8 +43,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             val themeViewModel: ThemeViewModel = hiltViewModel()
             val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
+            val colors = MaterialTheme.colorScheme
+            LaunchedEffect(colors) {
+                Log.d("ThemeDebug", "Primary: ${colors.primary}, Secondary: ${colors.secondary}")
+            }
 
-            RentTrackTheme(darkTheme = isDarkTheme) {
+            RentTrackTheme(darkTheme = isDarkTheme,dynamicColor = false) {
                 RootNavigationGraph(
                     modifier = Modifier.fillMaxSize(),
                     navController = rememberNavController(),
