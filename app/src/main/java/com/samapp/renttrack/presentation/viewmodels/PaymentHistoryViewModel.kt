@@ -39,6 +39,10 @@ class PaymentHistoryViewModel @Inject constructor(
     private val _addPaymentHistoryEvent = MutableSharedFlow<Result<Unit>>()
     val addPaymentHistoryEvent = _addPaymentHistoryEvent.asSharedFlow()
 
+    fun resetRentState() {
+        _currentMonthInfoState.value = Result.Loading()
+    }
+
     fun payRentForCurrentMonth(tenant: Tenant){
         viewModelScope.launch {
             _currentMonthInfoState.value = Result.Loading()

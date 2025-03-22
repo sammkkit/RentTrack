@@ -125,7 +125,7 @@ class RentInvoiceRepositoryImpl(private val context: Context) : RentInvoiceRepos
         canvas.drawText("₹${tenant.deposit}", 400f, 350f, paint)
 
         val remainingAmount = tenant.deposit?.minus((tenant.outstandingDebt ?: 0.0))
-    paint.typeface = Typeface.DEFAULT_BOLD
+        paint.typeface = Typeface.DEFAULT_BOLD
         canvas.drawText("Remaining Amount", 50f, 400f, paint)
         canvas.drawText("₹${
             remainingAmount
