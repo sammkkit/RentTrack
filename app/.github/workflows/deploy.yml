@@ -32,8 +32,8 @@ jobs:
       - name: Upload to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJson: playstore.json
-          packageName: com.yourapp.package  # Replace with your app's package name
+          serviceAccountJson: PLAY_STORE_JSON
+          packageName: com.samapp.renttrack  # Replace with your app's package name
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: internal  # Change to 'production' when ready
           status: completed
