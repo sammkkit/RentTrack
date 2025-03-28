@@ -21,7 +21,8 @@ jobs:
           java-version: '17'
 
       - name: Decrypt Play Store JSON
-        run: echo '${{ secrets.PLAY_STORE_JSON }}' > playstore.json
+        run: echo '${{ secrets.PLAY_STORE_JSON }}' | base64 --decode > playstore.json
+
 
       - name: Set up Gradle
         run: chmod +x gradlew
@@ -32,8 +33,8 @@ jobs:
       - name: Upload to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJson: playstore.json
-          packageName: com.yourapp.package  # Replace with your app's package name
+          serviceAccountJson: PLAY_STORE_JSON
+          packageName: com.samapp.renttrack  # Replace with your app's package name
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: internal  # Change to 'production' when ready
           status: completed
