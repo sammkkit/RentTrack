@@ -21,8 +21,7 @@ jobs:
           java-version: '17'
 
       - name: Decrypt Play Store JSON
-        run: echo '${{ secrets.PLAY_STORE_JSON }}' | base64 --decode > playstore.json
-
+        run: echo '${{ secrets.PLAY_STORE_JSON }}' -> PLAY_STORE_JSON
 
       - name: Set up Gradle
         run: chmod +x gradlew
