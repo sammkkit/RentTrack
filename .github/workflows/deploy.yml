@@ -23,8 +23,9 @@ jobs:
       - name: Decrypt Play Store JSON
         run: echo '${{ secrets.PLAY_STORE_JSON }}' > PLAY_STORE_JSON
 
-      - name: Set File Permissions
-        run: chmod 600 PLAY_STORE_JSON
+      - name: Set up Gradle permissions
+        run: chmod +x ./gradlew
+
 
       - name: Build Release APK
         run: ./gradlew bundleRelease
