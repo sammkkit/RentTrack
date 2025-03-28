@@ -288,13 +288,14 @@ fun tenantDetailScreen(
                                     paymentHistoryViewModel.payRentForCurrentMonth(tenant)
 
                                 },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(2f)
                             ) {
                                 Text("Collect Rent")
                             }
+                            Spacer(modifier = Modifier.weight(1f))
                             Button(
                                 onClick = { showPaymentDialog = true }, // Open payment dialog
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(2f)
                             ) {
                                 Text("Record Payment")
                             }
@@ -369,6 +370,10 @@ fun tenantDetailScreen(
                             confirmButton = {
                                 Button(onClick = {
                                     // Call ViewModel function to save payment
+                                    if(paymentAmount.isEmpty() || paymentAmount.toDoubleOrNull() == null){
+                                        Toast.makeText(context,"Enter Valid Amount", Toast.LENGTH_SHORT).show()
+                                        return@Button
+                                    }
                                     paymentHistoryViewModel.addPaymentHistory(
                                         PaymentHistory(
                                             tenantId = tenantId,

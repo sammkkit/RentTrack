@@ -1,0 +1,39 @@
+name: Deploy to Play Store
+
+on:
+  push:
+    branches:
+      - main  # Change this if your main branch has a different name
+
+jobs:
+  deploy:
+    name: Upload to Play Store
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Decrypt Play Store JSON
+        run: echo '${{ secrets.PLAY_STORE_JSON }}' > playstore.json
+
+      - name: Set up Gradle
+        run: chmod +x gradlew
+
+      - name: Build Release APK
+        run: ./gradlew bundleRelease
+
+      - name: Upload to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: playstore.json
+          packageName: com.yourapp.package  # Replace with your app's package name
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: internal  # Change to 'production' when ready
+          status: completed
