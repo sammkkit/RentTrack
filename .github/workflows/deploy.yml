@@ -44,6 +44,9 @@ jobs:
       - name: Setup Authorization with Play Store
         run: echo '${{ secrets.RENT_TRACK_JSON }}' > serviceAccount.json
 
+      - name: Clean Project
+        run: ./gradlew clean
+
       - name: Deploy to Play Store
         uses: r0adkll/upload-google-play@v1.1.3
         with:
