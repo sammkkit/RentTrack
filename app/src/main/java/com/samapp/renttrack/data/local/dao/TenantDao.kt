@@ -7,6 +7,8 @@ import androidx.room.Query
 import androidx.room.Update
 import com.samapp.renttrack.data.local.model.Result
 import com.samapp.renttrack.data.local.model.Tenant
+import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 @Dao
 interface TenantDao {
@@ -30,4 +32,7 @@ interface TenantDao {
 
     @Query("SELECT * FROM tenant_table WHERE name LIKE :nameQuery")
     suspend fun searchTenantsByName(nameQuery: String): List<Tenant>
+
+    @Query("SELECT * FROM tenant_table WHERE rentDueDate BETWEEN :today AND :duedateLimit")
+    suspend fun getUpcomingDueTenants(today:LocalDate , duedateLimit: LocalDate): List<Tenant>
 }

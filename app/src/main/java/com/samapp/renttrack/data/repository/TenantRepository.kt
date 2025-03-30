@@ -4,6 +4,8 @@ import android.util.Log
 import com.samapp.renttrack.data.local.dao.TenantDao
 import com.samapp.renttrack.data.local.model.Result
 import com.samapp.renttrack.data.local.model.Tenant
+import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 import javax.inject.Inject
 
 const val TAG = "TenantRepository"
@@ -55,6 +57,18 @@ class TenantRepository @Inject constructor(
             }
         } catch (e: Exception) {
             Result.Error(message = e.message ?: "An unexpected error occurred")
+        }
+    }
+
+    suspend fun getUpcomingDueTenants(): List<Tenant>{
+        return try {
+            val today = LocalDate.now()
+            val duedateLimit = LocalDate.now().plusDays(3)
+
+            val tenantsFlow = tenantDao.getUpcomingDueTenants(today, duedateLimit)
+            tenantsFlow
+        } catch (e: Exception) {
+            throw e
         }
     }
 

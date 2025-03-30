@@ -43,7 +43,8 @@ android {
 }
 
 dependencies {
-
+    //work manager
+    implementation(libs.androidx.work.runtime.ktx)
     //itext
     implementation(libs.itext7.core)
 
@@ -54,6 +55,7 @@ dependencies {
     //Room
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.hilt.work)
     kapt(libs.androidx.room.compiler)
 
     //navigation

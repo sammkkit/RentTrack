@@ -2,6 +2,7 @@ package com.samapp.renttrack.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.work.WorkerFactory
 import com.samapp.renttrack.data.local.dao.PaymentHistoryDao
 import com.samapp.renttrack.data.local.dao.TenantDao
 import com.samapp.renttrack.data.local.database.AppDatabase
@@ -201,4 +202,8 @@ object DatabaseModule {
         return ShareInvoiceUseCase(invoiceRepository)
     }
 
+
+    //worker
+
 }
+
