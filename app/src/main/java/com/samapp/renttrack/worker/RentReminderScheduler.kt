@@ -18,7 +18,7 @@ object RentReminderScheduler {
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "rent_due_reminder",
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             workRequest
         )
     }
@@ -30,11 +30,11 @@ object RentReminderScheduler {
             set(java.util.Calendar.SECOND, 0)
         }
 
-        return if (now.after(target)) {
+        if (now.after(target)) {
+            // If the current time is past 9 AM, schedule for the next day
             target.add(java.util.Calendar.DAY_OF_MONTH, 1)
-            target.timeInMillis - now.timeInMillis
-        } else {
-            target.timeInMillis - now.timeInMillis
         }
+
+        return target.timeInMillis - now.timeInMillis
     }
 }

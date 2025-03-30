@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.WorkerParameters
 import com.samapp.renttrack.data.repository.TenantRepository
 import com.samapp.renttrack.util.RentDueNotificationHelper
@@ -19,7 +20,7 @@ import javax.inject.Inject
 class RentDueWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted private val workerParams: WorkerParameters,
-    private val tenantRepository: TenantRepository
+    @Assisted private val tenantRepository: TenantRepository
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -39,7 +40,7 @@ class RentDueWorker @AssistedInject constructor(
             Result.success()
         } catch (e: Exception) {
             Log.e("RentDueWorker", "Error fetching due tenants", e)
-            Result.retry() // Retry the work if it fails
+            Result.failure(Data.Builder().putString("error", e.message).build()) // Retry the work if it fails
         }
     }
 }

@@ -202,8 +202,5 @@ object DatabaseModule {
         return ShareInvoiceUseCase(invoiceRepository)
     }
 
-
-    //worker
-
 }
 
