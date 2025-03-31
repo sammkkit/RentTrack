@@ -11,10 +11,11 @@ object RentReminderScheduler {
     fun scheduleDailyReminder(
         context: Context
     ){
+        val delay = calculateInitialDelay()
         val workRequest = PeriodicWorkRequestBuilder<RentDueWorker>(
             1,TimeUnit.DAYS
         )
-            .setInitialDelay(10, TimeUnit.SECONDS)
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
             .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(

@@ -288,14 +288,13 @@ fun tenantDetailScreen(
                                     paymentHistoryViewModel.payRentForCurrentMonth(tenant)
 
                                 },
-                                modifier = Modifier.weight(2f)
+                                modifier = Modifier.weight(1f)
                             ) {
                                 Text("Collect Rent")
                             }
-                            Spacer(modifier = Modifier.weight(1f))
                             Button(
                                 onClick = { showPaymentDialog = true }, // Open payment dialog
-                                modifier = Modifier.weight(2f)
+                                modifier = Modifier.weight(1f)
                             ) {
                                 Text("Record Payment")
                             }
