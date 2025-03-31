@@ -8,6 +8,7 @@ import javax.inject.Inject
 import  com.samapp.renttrack.data.local.model.Result
 import com.samapp.renttrack.data.local.model.Tenant
 import com.samapp.renttrack.domain.usecases.PaymentHistory.AddPaymentHistoryUseCase
+import com.samapp.renttrack.domain.usecases.PaymentHistory.CheckCurrentMonthRentUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetAllPaymentHistoryUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetPaymentHistoryForTenantUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetPaymentInfoForMonthUseCase
@@ -23,7 +24,8 @@ class PaymentHistoryViewModel @Inject constructor(
     private val getPaymentHistoryForTenantUseCase: GetPaymentHistoryForTenantUseCase,
     private val addPaymentHistoryUseCase: AddPaymentHistoryUseCase,
     private val getAllPaymentHistoryUseCase: GetAllPaymentHistoryUseCase,
-    private val getPaymentInfoForMonthUseCase: GetPaymentInfoForMonthUseCase
+    private val getPaymentInfoForMonthUseCase: GetPaymentInfoForMonthUseCase,
+    private val checkCurrentMonthRentUseCase: CheckCurrentMonthRentUseCase
 ) : ViewModel() {
 
     private val _paymentHistoryState = MutableStateFlow<Result<List<PaymentHistory>>>(Result.Loading())
@@ -59,6 +61,22 @@ class PaymentHistoryViewModel @Inject constructor(
         }
     }
 
+    fun checkCurrentMonthPayment(tenantId: Int):Boolean  {
+        viewModelScope.launch {
+            _currentMonthInfoState.value = Result.Loading()
+            val result = checkCurrentMonthRentUseCase.checkCurrentMonth(tenantId)
+            if (result) {
+                _currentMonthInfoState.value = Result.Success(Unit)
+            } else {
+                _currentMonthInfoState.value = Result.Error( "Not paid this month")
+            }
+        }
+        if(currentMonthInfoState.value is Result.Success<*>){
+            return true
+        }else
+            return false
+    }
+
     fun getPaymentHistoryForTenant(tenantId: Int) {
         viewModelScope.launch {
             _paymentHistoryState.value = Result.Loading()
@@ -77,7 +95,6 @@ class PaymentHistoryViewModel @Inject constructor(
             }
         }
     }
-
     fun getAllPaymentHistory() {
         viewModelScope.launch {
             _AllpaymentHistoryState.value = Result.Loading()

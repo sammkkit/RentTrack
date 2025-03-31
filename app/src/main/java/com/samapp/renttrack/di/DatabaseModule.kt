@@ -19,6 +19,7 @@ import com.samapp.renttrack.domain.usecases.InvoiceUseCases.GenerateInvoiceUseCa
 import com.samapp.renttrack.domain.usecases.InvoiceUseCases.GenerateTransactionInvoiceUseCase
 import com.samapp.renttrack.domain.usecases.InvoiceUseCases.ShareInvoiceUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.AddPaymentHistoryUseCase
+import com.samapp.renttrack.domain.usecases.PaymentHistory.CheckCurrentMonthRentUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetAllPaymentHistoryUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetPaymentHistoryForTenantUseCase
 import com.samapp.renttrack.domain.usecases.PaymentHistory.GetPaymentInfoForMonthUseCase
@@ -142,6 +143,12 @@ object DatabaseModule {
     @Singleton
     fun provideGetPaymentInforForMonthUseCase(paymentHistoryRepository: PaymentHistoryRepository): GetPaymentInfoForMonthUseCase{
         return GetPaymentInfoForMonthUseCase(paymentHistoryRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCheckCurrentMonthRentUseCase(paymentHistoryRepository: PaymentHistoryRepository): CheckCurrentMonthRentUseCase{
+        return CheckCurrentMonthRentUseCase(paymentHistoryRepository)
     }
 
 

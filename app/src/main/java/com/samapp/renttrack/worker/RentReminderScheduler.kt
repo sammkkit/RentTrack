@@ -2,6 +2,7 @@ package com.samapp.renttrack.worker
 
 import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
@@ -13,14 +14,15 @@ object RentReminderScheduler {
         val workRequest = PeriodicWorkRequestBuilder<RentDueWorker>(
             1,TimeUnit.DAYS
         )
-            .setInitialDelay(calculateInitialDelay(), TimeUnit.MILLISECONDS)
+            .setInitialDelay(10, TimeUnit.SECONDS)
             .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "rent_due_reminder",
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            ExistingPeriodicWorkPolicy.UPDATE,
             workRequest
         )
+
     }
     private fun calculateInitialDelay(): Long {
         val now = java.util.Calendar.getInstance()
