@@ -14,7 +14,7 @@ android {
         applicationId = "com.samapp.renttrack"
         minSdk = 29
         targetSdk = 35
-        versionCode = 10
+        versionCode = 2
         versionName = "2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
