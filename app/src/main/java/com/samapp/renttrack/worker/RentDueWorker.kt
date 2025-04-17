@@ -65,7 +65,7 @@ class RentDueWorker @AssistedInject constructor(
             Result.success()
         } catch (e: Exception) {
             Log.e("RentDueWorker", "Error fetching due tenants", e)
-            Result.failure(Data.Builder().putString("error", e.message).build()) // Retry the work if it fails
+            Result.failure(Data.Builder().putString("error", e.message).build())
         }
     }
 
