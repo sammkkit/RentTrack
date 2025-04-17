@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "465336125856",
+    "project_id": "renttrack-b1755",
+    "storage_bucket": "renttrack-b1755.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465336125856:android:d885857d661ca3a2eafcc5",
+        "android_client_info": {
+          "package_name": "com.samapp.renttrack"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAR8UI_1V4ep6JfqnE_QscZXt6uV06WOYQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -11,6 +11,7 @@ import androidx.work.Configuration
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.google.firebase.messaging.FirebaseMessaging
 import com.samapp.renttrack.data.local.database.AppDatabase
 import com.samapp.renttrack.data.local.model.Tenant
 import com.samapp.renttrack.util.RentDueNotificationHelper
@@ -35,6 +36,22 @@ class App :Application(),Configuration.Provider{
 
     override fun onCreate() {
         super.onCreate()
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                Log.d("FCM", "Token: $token")
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "channel_id",
+                "App Notifications",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+
         RentReminderScheduler.scheduleDailyReminder(this)
         logWorkManagerStatus()
     }
