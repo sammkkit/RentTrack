@@ -50,7 +50,9 @@ fun RootNavigationGraph(
             startDestination = Screen.Home.route,
             route = Screen.BottomNavigation.route,
         ) {
-            composable(Screen.Home.route) {
+            composable(
+                Screen.Home.route,
+            ) {
                 HomeScreen(
                     onFabClick = { navController.navigate(Screen.AddTenant.route) },
                     navController = navController,

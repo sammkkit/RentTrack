@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.samapp.renttrack.R
@@ -81,10 +82,19 @@ fun BottomNavigationBar(
                 } ,
                 selected = isSelected == index,
                 onClick = {
-                    isSelected = index
-                    navController.navigate(item.route){
-                        popUpTo(Screen.Home.route) { saveState = true }
-                        launchSingleTop = true
+//                    isSelected = index
+//                    navController.navigate(item.route){
+//                        popUpTo(Screen.Home.route) { saveState = true }
+//                        launchSingleTop = true
+//                    }
+                    if (isSelected!= index) {
+                        navController.navigate(item.route) {
+                            launchSingleTop = true
+                            restoreState = true
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                        }
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
