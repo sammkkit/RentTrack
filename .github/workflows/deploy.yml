@@ -53,5 +53,5 @@ jobs:
           ServiceAccountJson: serviceAccount.json
           packageName: com.samapp.renttrack
           releaseFiles: app/release/app-release.aab
-          track: internal
+          track: production
           status: 'completed'
